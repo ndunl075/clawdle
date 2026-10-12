@@ -82,7 +82,7 @@ export class AppController {
             this.publish();
             return;
         }
-        let next = structuredClone(this.state);
+        const next = structuredClone(this.state);
         const newResults: ResultRow[] = [];
         for (const entry of entries.sort((a, b) => a.seq - b.seq)) {
             if (entry.seq <= next.processedSeq)

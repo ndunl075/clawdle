@@ -82,6 +82,26 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
+  packages/app-core:
+    dependencies:
+      '@clawdle/game':
+        specifier: workspace:*
+        version: link:../game
+
+  packages/game: {}
+
+  packages/platform-desktop:
+    dependencies:
+      '@clawdle/app-core':
+        specifier: workspace:*
+        version: link:../app-core
+
+  packages/platform-web:
+    dependencies:
+      '@clawdle/app-core':
+        specifier: workspace:*
+        version: link:../app-core
+
   packages/ui:
     dependencies:
       react:
