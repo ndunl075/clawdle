@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { test, expect, type Page } from '@playwright/test';
 import { selectDailyWord, wordFromId } from '../../packages/game/src/index';
 
@@ -90,4 +91,22 @@ test('compact desktop viewport keeps the complete keyboard visible',async({page}
   const lastKey=page.getByRole('button',{name:'Delete letter'});
   await expect(lastKey).toBeVisible();
   const bounds=await lastKey.boundingBox();expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(619);
+});
+
+test('unsupported saved profile is preserved and offers explicit private recovery export',async({page})=>{
+  await page.goto('/');await typeWord(page,'APPLE');
+  await expect(page.getByRole('group',{name:'Guess 1',exact:true}).locator('.tile > span:first-child')).toHaveText([...'APPLE']);
+  await expect(page.getByRole('button',{name:'Delete letter'})).toBeEnabled();
+  await page.evaluate(()=>new Promise<void>((resolve,reject)=>{
+    const open=indexedDB.open('clawdle-v1');open.onerror=()=>reject(open.error);
+    open.onsuccess=()=>{const db=open.result;const tx=db.transaction('meta','readwrite');const store=tx.objectStore('meta');const get=store.get('checkpoint');get.onsuccess=()=>{const checkpoint=get.result;checkpoint.state.schemaVersion=99;store.put(checkpoint,'checkpoint');};tx.oncomplete=()=>{db.close();resolve();};tx.onabort=()=>reject(tx.error);};
+  }));
+  await page.reload();await expect(page.getByRole('heading',{name:/couldn.t open your save/})).toBeVisible();
+  page.once('dialog',dialog=>dialog.accept());
+  const downloadPromise=page.waitForEvent('download');
+  await page.getByRole('button',{name:'Export private recovery copy'}).click();
+  const download=await downloadPromise;const file=await download.path();
+  const copy=JSON.parse(await readFile(file!,'utf8'));
+  expect(copy.format).toBe('clawdle-recovery');expect(copy.snapshot.checkpoint.state.schemaVersion).toBe(99);
+  expect(Object.values(copy.snapshot.checkpoint.state.games)).toHaveLength(1);
 });

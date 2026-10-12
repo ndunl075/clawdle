@@ -6,6 +6,9 @@ fn validate(text: &str) -> Result<(), String> {
         return Err("export_too_large".into());
     }
     let value: serde_json::Value = serde_json::from_str(text).map_err(|_| "export_invalid_json")?;
+    if value["format"] == "clawdle-recovery" && value["version"] == 1 && value["snapshot"].is_object() {
+        return Ok(());
+    }
     if value["format"] != "clawdle-export"
         || value["version"] != 1
         || !value["games"].is_array()
@@ -106,5 +109,7 @@ mod tests {
         assert!(validate("{}").is_err());
         assert!(validate(&" ".repeat(MAX_EXPORT_BYTES + 1)).is_err());
         assert!(save_selected(&text(), Some(PathBuf::from("relative.json"))).is_err());
+        assert!(validate(r#"{"format":"clawdle-recovery","version":1,"snapshot":{}}"#).is_ok());
+        assert!(validate(r#"{"format":"clawdle-recovery","version":2,"snapshot":{}}"#).is_err());
     }
 }

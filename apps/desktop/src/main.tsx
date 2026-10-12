@@ -11,4 +11,4 @@ void mountClawdle(async()=>createController(createDesktopPlatform({invoke,listen
   uninstall:(scope,project)=>invoke('integration_uninstall',{scope,project}),
   configure:autoLaunch=>invoke<void>('integration_configure',{autoLaunch}),
   exportData:text=>invoke<string|null>('native_export',{text})
-});
+},()=>invoke('runtime_snapshot'));
