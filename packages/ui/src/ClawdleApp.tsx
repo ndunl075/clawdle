@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { create } from 'zustand';
 import clawdleLogo from './assets/clawdle.png';
+import { observeVisibleClock } from './visibleClock';
 import type { AppController } from '@clawdle/app-core';
 import { dailyKey, dailyPuzzleNumber, mergeKeyboardStates, type Mode } from '@clawdle/game';
 
@@ -38,14 +39,15 @@ export function ClawdleApp({controller,integration}:{controller:AppController;in
   const state = controller.state;
   const game = state.activeGameId ? state.games[state.activeGameId] : undefined;
   const race = state.activeRaceId ? state.races[state.activeRaceId] : undefined;
-  const agent = race ? state.agentStatuses[JSON.stringify([race.provider,race.sessionId])] : Object.values(state.agentStatuses).sort((a,b)=>b.lastSeq-a.lastSeq)[0];
+  const latestAgent = useMemo(() => Object.values(state.agentStatuses).reduce<(typeof state.agentStatuses)[string] | undefined>((latest,item) => !latest || item.lastSeq > latest.lastSeq ? item : latest, undefined),[state.agentStatuses]);
+  const agent = race ? state.agentStatuses[JSON.stringify([race.provider,race.sessionId])] : latestAgent;
   const run = state.activeSpeedrunId ? state.speedruns[state.activeSpeedrunId] : undefined;
   const settings = state.settings;
-  const stats = controller.stats(mode);
-  const keyboard = mergeKeyboardStates(game?.guesses ?? []);
+  const stats = useMemo(() => controller.stats(mode),[controller,state,mode,utcDay]);
+  const keyboard = useMemo(() => mergeKeyboardStates(game?.guesses ?? []),[game?.guesses]);
+  const offers = useMemo(() => Object.values(state.races).filter(item=>item.state==='offered'&&item.raceId!==state.activeRaceId),[state.races,state.activeRaceId]);
   const currentMode = game?.mode ?? mode;
 
-  useEffect(() => {const timer=window.setInterval(()=>setUtcDay(dailyKey(Date.now())),1000);return()=>window.clearInterval(timer);},[]);
   useEffect(() => {if(dialog==='connect'&&integration)void integration.doctor().then(report=>{if(report&&typeof report==='object'&&'autoLaunch' in report)setAutoLaunch(report.autoLaunch===true);}).catch(e=>setIntegrationReport(String(e)));},[dialog,integration]);
   useEffect(() => controller.subscribe(() => rerender(n=>n+1)),[controller]);
   useEffect(() => {
@@ -59,13 +61,14 @@ export function ClawdleApp({controller,integration}:{controller:AppController;in
       return ()=>{cancelled=true;};
     }
   },[controller,integration,race?.raceId,race?.state,settings.autoRace,game?.gameId,visibilityRevision]);
-  useEffect(() => {
-    if (!race && !run) return;
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === 'visible') { setNow(controller.clock().monoMs); if (run?.status === 'running') void controller.dispatch({type:'tick'}).catch(e=>setNotice(String(e))); }
-    },250);
-    return ()=>window.clearInterval(timer);
-  },[controller,race?.raceId,run?.speedrunId,run?.status]);
+  useEffect(() => observeVisibleClock({
+    active: race?.state === 'running' || run?.status === 'running',
+    deadline: run?.status === 'running' ? run.deadlineMonoMs : undefined,
+    readMono: () => controller.clock().monoMs,
+    onTime: setNow,
+    onDay: utcMs => setUtcDay(dailyKey(utcMs)),
+    onDeadline: () => { void controller.dispatch({type:'tick'}).catch(e=>setNotice(String(e))); },
+  }),[controller,race?.raceId,race?.state,run?.speedrunId,run?.status,run?.deadlineMonoMs]);
   useEffect(() => {
     const refresh = () => { setVisibilityRevision(n=>n+1);if(document.visibilityState === 'visible') void controller.refresh().catch(e=>setNotice(String(e))); };
     document.addEventListener('visibilitychange',refresh);
@@ -145,7 +148,7 @@ export function ClawdleApp({controller,integration}:{controller:AppController;in
       {race?.state==='running'&&currentMode==='race'&&<button className="text-button skip" onClick={()=>void dispatch({type:'leaveRace'})}>Leave race · keep puzzle</button>}
       {game?.status==='playing'&&currentMode==='endless'&&<button className="text-button skip" onClick={()=>{if(window.confirm('Reveal the answer and record a practice loss?'))void dispatch({type:'giveUp'});}}>Give up & reveal</button>}
     </>}
-    {Object.values(state.races).filter(item=>item.state==='offered'&&item.raceId!==state.activeRaceId).map(offer=><button className="offer" key={offer.raceId} onClick={()=>void dispatch({type:'presentRace',raceId:offer.raceId,lateJoin:true})}>Claude is working · Join an unranked puzzle →</button>)}
+    {offers.map(offer=><button className="offer" key={offer.raceId} onClick={()=>void dispatch({type:'presentRace',raceId:offer.raceId,lateJoin:true})}>Claude is working · Join an unranked puzzle →</button>)}
     <div className="sr-only" aria-live="polite" aria-atomic="true">{game?.guesses.length?`Guess ${game.guesses.length}: ${[...game.guesses.at(-1)!.word].map((letter,i)=>`${letter} ${game.guesses.at(-1)!.tiles[i]}`).join(", ")}.`:""}</div>
     <footer className="footer"><span className="footer-flower" aria-hidden="true">✳</span><p>Five letters. Six guesses. A little room to think.</p><span className="local-note"><i/> Free. Local. Yours.</span></footer>
     {dialog&&<Modal title={dialog==='help'?'A little word break.':dialog==='stats'?'Your word habit.':dialog==='settings'?'Make yourself at home.':dialog==='share'?'A solve worth sharing.':dialog==='saved'?'Pick up where you left off.':'Connect Claude.'} onClose={()=>{setDialog(null);surface.current?.focus();}}>
