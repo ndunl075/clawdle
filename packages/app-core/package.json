@@ -1,0 +1,1 @@
+{"name":"@clawdle/app-core","version":"0.1.0","private":true,"type":"module","exports":"./src/index.ts","dependencies":{"@clawdle/game":"workspace:*"}}
