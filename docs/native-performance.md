@@ -22,3 +22,18 @@ After readiness, the harness measures a sustained idle interval and retains each
 Cleanup terminates only processes launched by this invocation or their captured, verified descendants. One fresh process-tree snapshot supplies cleanup candidates. Before each termination an anchored native handle rechecks creation time and executable path, a bounded CIM call verifies the current-user SID, and the fixture marker is checked. No additional full enumeration is performed for each cleanup PID. CIM operations default to an eight-second timeout (`-CimTimeoutSeconds`, 1–10); timeouts fail the run rather than silently omit unreadable processes. Snapshots request only PID, parent, creation time, and executable path. Sample CPU denominators use actual wall-clock intervals, including slow enumeration and report writes; the requested sample interval is not substituted. It does not kill by application name or trust an arbitrary PID in a profile. Root termination prevents further intentional child creation; an exceptional or unverifiable process is preserved rather than killed. Cleanup is abrupt, so these fixtures are measurement artifacts, not valuable game profiles. If verification or cleanup fails, inspect the retained report/fixtures and process list manually before rerunning; no arbitrary cleanup command is provided.
 
 The JSON includes executable SHA-256, OS/PowerShell/Python versions, logical processor count, all successful launch samples, and any failure. A failed launch cannot establish an acceptance metric. This tool's static validation does not constitute a native performance result. Root acceptance must execute it against the final packaged build and retain the report, then separately verify visible native UI, typing, and focus behavior.
+
+## Descendant inspection and self-test
+
+A WebView2 child can exit between process enumeration and inspection, or report an empty `ExecutablePath` through CIM. The harness handles both without weakening verification:
+
+- A descendant that has exited (or whose PID was recycled to a different creation time) is dropped from that sample and counted in the sample's `exitedDuringSample` (and the launch's `exitedObservations`). It is not an error.
+- A descendant that is alive with an empty CIM path is retried through `Get-Process .Path` and `QueryFullProcessImageName` (at most three 100 ms attempts per enumeration). A recovered path must still be this app's executable or `msedgewebview2.exe`, free of reparse points, and owned by the current user; anything else still fails the run.
+- If the path stays unrecoverable the process is **not** included in totals or ever terminated, and is counted in the sample's `unverified` and the launch's `unverifiedObservations`. Any such observation makes the launch and the report `status: incomplete`, never `completed`; an incomplete report is not an acceptance result. Children of an unverified process are not discovered either, which is why the run cannot pass.
+- Cleanup only terminates processes whose path was verified (by either source) and re-checks it against the live process before each kill.
+
+The classification logic lives in `scripts/native-performance.lib.ps1` and is exercised with injected fake process rows (exited, empty path recovered, empty path unrecoverable, foreign executable) by a headless self-test that launches nothing and writes no files. It is not wired into CI:
+
+```powershell
+powershell -NoProfile -File scripts/native-performance.tests.ps1
+```

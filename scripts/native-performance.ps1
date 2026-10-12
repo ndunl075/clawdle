@@ -23,6 +23,7 @@ function Assert-PlainPath([string]$Path) {
     }
 }
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+. (Join-Path $PSScriptRoot 'native-performance.lib.ps1')
 if (-not [IO.Path]::IsPathRooted($App) -or -not [IO.Path]::IsPathRooted($DataDir)) {
     throw 'App and DataDir must be explicit absolute paths.'
 }
@@ -55,7 +56,15 @@ $reportPath = Join-Path $fixture 'performance.json'
 $progressPath = Join-Path $fixture 'progress.json'
 $activeRun = $null
 $failure = $null
+$unverifiedTotal = 0
 $reportStatus = 'running'
+$verifiedPaths = @{}
+$treeStats = @{exited=0;unverified=0}
+$recoverPath = { param($r) Resolve-ProcessPathFallback -ProcessId $r.ProcessId -CreationDate $r.CreationDate }
+function Test-RowAlive($Row) {
+    $current = Get-CimInstance Win32_Process -Filter "ProcessId=$($Row.ProcessId)" -Property ProcessId,ParentProcessId,CreationDate,ExecutablePath -OperationTimeoutSec $CimTimeoutSeconds | Select-Object -First 1
+    return ($null -ne $current -and (Get-Identity $current) -eq (Get-Identity $Row))
+}
 function Assert-FixtureOwner {
     Assert-PlainPath $marker
     $value = Get-Content -LiteralPath $marker -Raw | ConvertFrom-Json
@@ -99,6 +108,7 @@ function Save-Report {
             'CPU mean is the arithmetic mean of sampled intervals; inspect raw elapsed times for weighted analysis.',
             'Only verified native/WebView2 descendants are included; system services, GPU driver memory and unrelated processes are excluded.',
             'CIM and Python inspection plus partial report writes consume harness resources outside the app process tree.',
+            'Descendants that exit between enumeration and inspection are dropped and counted (exitedDuringSample); descendants that stay alive but cannot be path-verified are counted (unverified) and force status incomplete.',
             'Running or failed partial reports are diagnostic evidence, not completed acceptance measurements.')})
 }
 function Assert-ProcessOwner($Row) {
@@ -108,6 +118,9 @@ function Assert-ProcessOwner($Row) {
 function Update-Tree {
     Save-Progress 'enumerating-process-tree'
     $rows = @(Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,CreationDate,ExecutablePath -OperationTimeoutSec $CimTimeoutSeconds)
+    $treeStats.exited = 0
+    $treeStats.unverified = 0
+    $handled = @{}
     $liveIdentities = @{}
     foreach ($row in $rows) { $liveIdentities[(Get-Identity $row)] = $true }
     $rootRow = $rows | Where-Object { $_.ProcessId -eq $started.Id } | Select-Object -First 1
@@ -117,7 +130,7 @@ function Update-Tree {
             throw 'Launched PID no longer identifies the selected executable and creation time.'
         }
         $id = Get-Identity $rootRow
-        if (-not $owned.ContainsKey($id)) { Assert-ProcessOwner $rootRow; $owned[$id]=$rootRow }
+        if (-not $owned.ContainsKey($id)) { Assert-ProcessOwner $rootRow; $owned[$id]=$rootRow; $verifiedPaths[$id]=$appPath }
     }
     # Fixed point: include only native/WebView2 children of a verified identity.
     # Creation-time ordering prevents a reused parent PID adopting an older process.
@@ -130,34 +143,45 @@ function Update-Tree {
                 $_.ProcessId -eq $row.ParentProcessId -and $_.CreationDate -le $row.CreationDate -and $liveIdentities.ContainsKey((Get-Identity $_))
             } | Select-Object -First 1
             if ($null -eq $parent) { continue }
-            if (-not $row.ExecutablePath) { throw 'Cannot verify a descendant executable.' }
-            $name = [IO.Path]::GetFileName($row.ExecutablePath)
-            if (-not $row.ExecutablePath.Equals($appPath,[StringComparison]::OrdinalIgnoreCase) -and $name -ine 'msedgewebview2.exe') {
-                throw "Unexpected descendant executable: $name"
+            if ($handled.ContainsKey($id)) { continue }
+            $handled[$id] = $true
+            $resolved = Resolve-DescendantExecutable -Row $row -AppPath $appPath -RecoverPath $recoverPath
+            if ($resolved.Outcome -eq 'exited') { $treeStats.exited++; continue }
+            if ($resolved.Outcome -eq 'unverified') { $treeStats.unverified++; continue } # Never owned, never counted in totals, never killed.
+            if ($resolved.Outcome -ne 'accept') { throw "Unexpected descendant executable: $($resolved.Name)" }
+            Assert-PlainPath $resolved.Path
+            try { Assert-ProcessOwner $row } catch {
+                if (-not (Test-RowAlive $row)) { $treeStats.exited++; continue }
+                throw
             }
-            Assert-PlainPath $row.ExecutablePath
-            Assert-ProcessOwner $row
+            $verifiedPaths[$id] = $resolved.Path
             $owned[$id] = $row
             $added = $true
         }
     } while ($added)
+    if ($null -ne $activeRun) {
+        $activeRun.exitedObservations += $treeStats.exited
+        $activeRun.unverifiedObservations += $treeStats.unverified
+    }
     return @($rows | Where-Object { $owned.ContainsKey((Get-Identity $_)) })
 }
 function Get-Sample([Diagnostics.Stopwatch]$Clock) {
     $rows = @(Update-Tree)
+    $sampleExited = $treeStats.exited
+    $sampleUnverified = $treeStats.unverified
     $members = [Collections.Generic.List[object]]::new()
     foreach ($row in $rows) {
         try {
             $process = Get-Process -Id $row.ProcessId -ErrorAction Stop
             try {
                 $null = $process.SafeHandle # Anchor the native process identity across subsequent reads.
-                if ([Math]::Abs(($process.StartTime.ToUniversalTime()-$row.CreationDate.ToUniversalTime()).TotalMilliseconds) -gt 10) { continue }
+                if ([Math]::Abs(($process.StartTime.ToUniversalTime()-$row.CreationDate.ToUniversalTime()).TotalMilliseconds) -gt 10) { $sampleExited++; continue }
                 $members.Add([pscustomobject][ordered]@{identity=(Get-Identity $row);pid=[int]$row.ProcessId;name=$process.ProcessName;
                     workingSetBytes=$process.WorkingSet64;privateBytes=$process.PrivateMemorySize64;cpuSeconds=$process.TotalProcessorTime.TotalSeconds})
             } finally { $process.Dispose() }
         } catch {
             $current = Get-CimInstance Win32_Process -Filter "ProcessId=$($row.ProcessId)" -OperationTimeoutSec $CimTimeoutSeconds | Select-Object -First 1
-            if ($null -eq $current -or (Get-Identity $current) -ne (Get-Identity $row)) { continue }
+            if ($null -eq $current -or (Get-Identity $current) -ne (Get-Identity $row)) { $sampleExited++; continue }
             throw # A live process with unreadable counters must not silently disappear from totals.
         }
     }
@@ -170,7 +194,7 @@ function Get-Sample([Diagnostics.Stopwatch]$Clock) {
     $seconds = $at-$previousAt.Value
     $cpuOneCore = if ($previousAt.Value -ge 0 -and $seconds -gt 0) { 100*$delta/$seconds } else { $null }
     $previousAt.Value = $at
-    return [pscustomobject][ordered]@{elapsedSeconds=$at;processCount=$members.Count;
+    return [pscustomobject][ordered]@{elapsedSeconds=$at;processCount=$members.Count;exitedDuringSample=$sampleExited;unverified=$sampleUnverified;
         workingSetBytes=[long](($members | Measure-Object workingSetBytes -Sum).Sum);
         privateBytes=[long](($members | Measure-Object privateBytes -Sum).Sum);
         cpuPercentOneCore=$cpuOneCore;cpuPercentMachine=$(if($null -ne $cpuOneCore){$cpuOneCore/$logicalProcessors}else{$null});processes=@($members.ToArray())}
@@ -189,14 +213,21 @@ function Stop-OwnedTree {
     foreach ($known in $identities) {
         $current = $currentByIdentity[(Get-Identity $known)]
         if ($null -eq $current) { continue }
-        if (-not $current.ExecutablePath -or $current.ExecutablePath -ne $known.ExecutablePath) { throw 'Process path changed; refusing termination.' }
+        $knownPath = $verifiedPaths[(Get-Identity $known)]
+        if (-not $knownPath -or ($current.ExecutablePath -and $current.ExecutablePath -ne $knownPath)) { throw 'Process path changed; refusing termination.' }
         Save-Progress "cleanup-verifying-pid-$($known.ProcessId)"
         $process = Get-Process -Id $current.ProcessId -ErrorAction SilentlyContinue
         if ($process) {
             try {
                 $null = $process.SafeHandle # Keep a handle to this identity; a recycled PID must not become a kill target.
                 if ([Math]::Abs(($process.StartTime.ToUniversalTime()-$known.CreationDate.ToUniversalTime()).TotalMilliseconds) -gt 10) { continue }
-                if (-not $process.Path.Equals($known.ExecutablePath,[StringComparison]::OrdinalIgnoreCase)) { throw 'Live process path changed; refusing termination.' }
+                $livePath = $null
+                try { $livePath = $process.Path } catch { $livePath = $null }
+                if (-not $livePath) {
+                    $fallback = Resolve-ProcessPathFallback -ProcessId $current.ProcessId -CreationDate $known.CreationDate
+                    if ($fallback.Status -eq 'path') { $livePath = $fallback.Path }
+                }
+                if (-not $livePath -or -not $livePath.Equals($knownPath,[StringComparison]::OrdinalIgnoreCase)) { throw 'Live process path changed or unverifiable; refusing termination.' }
                 Assert-ProcessOwner $current
                 Save-Progress "cleanup-stopping-pid-$($known.ProcessId)"
                 $process.Kill()
@@ -261,7 +292,7 @@ try {
         $clock = [Diagnostics.Stopwatch]::new()
         $activeRun = [ordered]@{launch=$launch;profile=$profile;status='starting';
             launchKind=$(if($launch -eq 1){'first process launch in this harness invocation; OS cache state uncontrolled'}else{'repeated OS-warmed launch; fresh app/WebView2 profile'});
-            readinessProxyMs=$null;checkpoint=$null;runtimeEpoch=$null;measuredDurationSeconds=0;sampleCount=0;
+            readinessProxyMs=$null;checkpoint=$null;runtimeEpoch=$null;measuredDurationSeconds=0;sampleCount=0;exitedObservations=0;unverifiedObservations=0;
             peakWorkingSetBytes=$null;peakPrivateBytes=$null;meanCpuPercentMachine=$null;samples=@()}
         $results.Add($activeRun)
         Save-Progress 'launching'
@@ -324,15 +355,17 @@ try {
         } finally {
             if ($started) { try { Stop-OwnedTree } finally { $started.Dispose() } }
         }
-        $activeRun.status='completed'
+        $activeRun.status=$(if($activeRun.unverifiedObservations -gt 0){'incomplete'}else{'completed'})
+        if($activeRun.unverifiedObservations -gt 0){ $unverifiedTotal += $activeRun.unverifiedObservations }
         $started=$null
         $launchedPid=$null
         Save-Progress 'launch-completed'
         Save-Report
     }
 } catch { $failure=$_.Exception.Message; if($null -ne $activeRun){$activeRun.status='failed'} }
-$reportStatus=if($failure){'failed'}else{'completed'}
+$reportStatus=Get-FinalReportStatus -Failure $failure -UnverifiedObservations $unverifiedTotal
 Save-Progress $reportStatus
 Save-Report
 Write-Output $reportPath
 if ($failure) { throw $failure }
+if ($reportStatus -eq 'incomplete') { Write-Warning "Run incomplete: $unverifiedTotal unverifiable descendant observation(s); see performance.json. Not an acceptance result." }
