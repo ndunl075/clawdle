@@ -1,0 +1,1 @@
+{"$schema":"../gen/schemas/desktop-schema.json","identifier":"main","description":"Local game window; no renderer shell, filesystem, SQL or token access.","windows":["main"],"permissions":["core:default"]}

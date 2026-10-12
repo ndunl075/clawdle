@@ -1,0 +1,77 @@
+use serde_json::Value;
+pub fn validate(v: &Value) -> Result<(), String> {
+    let o = v.as_object().ok_or("command_object")?;
+    let kind = o
+        .get("type")
+        .and_then(Value::as_str)
+        .ok_or("command_type")?;
+    let extra: &[&str] = match kind {
+        "startDaily" | "startEndless" | "giveUp" | "leaveRace" | "startSpeedrun" | "skipWord"
+        | "tick" | "interruptTiming" => &[],
+        "submitGuess" => {
+            if !v["word"].as_str().is_some_and(|s| s.len() <= 64) {
+                return Err("command_word".into());
+            }
+            &["word"]
+        }
+        "presentRace" => {
+            if !v["raceId"]
+                .as_str()
+                .is_some_and(|s| !s.is_empty() && s.len() <= 256)
+                || v.get("lateJoin").is_some_and(|v| !v.is_boolean())
+            {
+                return Err("command_race".into());
+            }
+            &["raceId", "lateJoin"]
+        }
+        "changeSettings" => {
+            let s = v["settings"].as_object().ok_or("command_settings")?;
+            if s.iter().any(|(k, v)| {
+                ![
+                    "autoRace",
+                    "sound",
+                    "highContrast",
+                    "reducedMotion",
+                    "speedrunEnabled",
+                    "alwaysOnTop",
+                ]
+                .contains(&k.as_str())
+                    || !v.is_boolean()
+            }) {
+                return Err("command_settings".into());
+            }
+            &["settings"]
+        }
+        "resetStatistics" | "resetAll" => {
+            if v["confirmed"] != true {
+                return Err("command_confirmation".into());
+            }
+            &["confirmed"]
+        }
+        _ => return Err("unknown_command".into()),
+    };
+    if o.keys()
+        .any(|k| k != "type" && k != "randomUnit" && !extra.contains(&k.as_str()))
+    {
+        return Err("command_field".into());
+    }
+    if v.get("randomUnit")
+        .is_some_and(|n| !n.as_f64().is_some_and(|n| (0.0..1.0).contains(&n)))
+    {
+        return Err("command_random".into());
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    #[test]
+    fn validates_known_commands_without_arbitrary_privileged_payload() {
+        assert!(validate(&json!({"type":"submitGuess","word":"APPLE","randomUnit":0.2})).is_ok());
+        assert!(validate(&json!({"type":"shell","command":"evil"})).is_err());
+        assert!(validate(&json!({"type":"submitGuess","word":"APPLE","prompt":"secret"})).is_err());
+        assert!(validate(&json!({"type":"changeSettings","settings":{"token":"secret"}})).is_err());
+        assert!(validate(&json!({"type":"resetAll","confirmed":false})).is_err());
+    }
+}
