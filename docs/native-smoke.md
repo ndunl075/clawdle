@@ -51,3 +51,16 @@ Final offline installer SHA-256: `10a88a646d3fec627da17e35d851f8ca737910b7f3b0d7
 At 16:31 UTC, a 10.005-second idle sample of the installed app and all six WebView2 descendants measured **407.17 MiB summed working set**, **185.75 MiB private bytes**, and **0.00 seconds reported CPU time**. The workload was the initial Daily checkpoint after the synthetic protocol smoke, with no input or animation during the sample. Process ancestry was captured before sampling and all seven processes remained alive at its end. Summed working sets can double-count shared pages; this is a short host-specific sample, not a sustained idle CPU guarantee. The architecture's below-150-MB working-set aim was **not met**. Cold launch and warm auto-show presentation remain unmeasured.
 
 The smoke helper selects the first executable resolved for Python, so a second Windows Store Python alias on PATH does not combine two paths into an invalid command.
+
+## Sustained baseline attempt
+
+On 2026-10-12, `scripts/native-performance.ps1` measured the same installed app hash above using fresh profiles in the private `.local/native-smoke-performance-baseline` fixture. Windows 11 Home build 26200 had 28 logical processors; other workstation workload and OS caches were uncontrolled. The original harness completed two idle intervals before failing on launch 3 with `Cannot verify a descendant executable.` Its report is retained; the invocation **failed** and does not establish the full performance acceptance gate.
+
+| Launch | Interval | Samples | Peak summed working set | Peak private bytes | Mean machine CPU |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 64.37 s | 6 | 396.10 MiB | 168.32 MiB | 0% reported |
+| 2 | 60.73 s | 6 | 396.00 MiB | 171.08 MiB | 0% reported |
+
+These samples cover the initial visible Daily workload without input, hooks or models. Slow CIM inspection produced sparse samples despite the requested 1-second interval. Zero reported CPU reflects measured process-counter deltas and their resolution, not proof of zero work. Shared pages can appear in multiple working sets. The working-set aim remains unmet. Checkpoint observations took about 132 seconds, dominated by inspection overhead; they are unsuitable evidence for the 2-second visible cold-launch aim. No warm auto-show pixels were timed.
+
+The follow-up harness bounds CIM queries, retains atomic progress and partial reports, and reduces repeated cleanup enumeration. It requires a new executed run; those tooling changes do not repair or upgrade this failed result. The installed binary predates the UI timer optimization merged in PR #16.
