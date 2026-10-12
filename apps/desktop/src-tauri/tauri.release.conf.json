@@ -1,0 +1,14 @@
+{
+  "bundle": {
+    "resources": {
+      "../../../target/release/clawdle-bridge.exe": "clawdle-bridge.exe",
+      "../../../assets/licenses/": "licenses/",
+      "../../../LICENSE": "LICENSE",
+      "../../../THIRD_PARTY_NOTICES.md": "THIRD_PARTY_NOTICES.md",
+      "../../../assets/words/answers-v1.json": "words/answers-v1.json",
+      "../../../assets/words/guesses-v1.txt": "words/guesses-v1.txt",
+      "../../../assets/words/daily-v1.json": "words/daily-v1.json",
+      "../../../assets/words/manifest.json": "words/manifest.json"
+    }
+  }
+}

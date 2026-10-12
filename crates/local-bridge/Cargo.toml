@@ -1,0 +1,12 @@
+[package]
+name = "clawdle-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+clawdle-agent-adapters = { path = "../agent-adapters" }
+clawdle-local-runtime = { path = "../local-runtime" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true

@@ -1,0 +1,22 @@
+[package]
+name = "clawdle-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+build = "build.rs"
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+[dependencies]
+clawdle-local-runtime = { path = "../../../crates/local-runtime" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+tokio.workspace = true
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-notification = "2"
+rand = "0.8"
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
