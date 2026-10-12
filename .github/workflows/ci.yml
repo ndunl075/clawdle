@@ -1,0 +1,54 @@
+name: Verify Clawdle
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: python scripts/words-generate.py --check
+      - run: pnpm contracts:generate --check
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - run: pnpm build:web
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-test-evidence
+          path: |
+            test-results/
+            playwright-report/
+  native:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: pnpm install --frozen-lockfile
+      - run: cargo test --workspace --locked
+      - run: pnpm build:desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-standard-installer
+          path: target/release/bundle/nsis/*.exe
