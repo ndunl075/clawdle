@@ -19,4 +19,4 @@ tauri-plugin-clipboard-manager = "2"
 tauri-plugin-notification = "2"
 rand = "0.8"
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation"] }
+windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging", "Win32_Foundation", "Win32_System_Power"] }

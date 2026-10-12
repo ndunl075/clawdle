@@ -8,6 +8,15 @@ pub fn validate(v: &Value) -> Result<(), String> {
     let extra: &[&str] = match kind {
         "startDaily" | "startEndless" | "giveUp" | "leaveRace" | "startSpeedrun" | "skipWord"
         | "tick" | "interruptTiming" => &[],
+        "resumeGame" => {
+            if !v["gameId"]
+                .as_str()
+                .is_some_and(|s| !s.is_empty() && s.len() <= 256)
+            {
+                return Err("command_game".into());
+            }
+            &["gameId"]
+        }
         "submitGuess" => {
             if !v["word"].as_str().is_some_and(|s| s.len() <= 64) {
                 return Err("command_word".into());
@@ -66,6 +75,41 @@ pub fn validate(v: &Value) -> Result<(), String> {
 mod tests {
     use super::*;
     use serde_json::json;
+    #[test]
+    fn accepts_every_application_command_variant() {
+        for kind in [
+            "startDaily",
+            "startEndless",
+            "giveUp",
+            "leaveRace",
+            "startSpeedrun",
+            "skipWord",
+            "tick",
+            "interruptTiming",
+        ] {
+            assert!(validate(&json!({"type":kind})).is_ok(), "{kind}");
+        }
+        for command in [
+            json!({"type":"resumeGame","gameId":"saved-game"}),
+            json!({"type":"submitGuess","word":"APPLE"}),
+            json!({"type":"presentRace","raceId":"race","lateJoin":true}),
+            json!({"type":"changeSettings","settings":{"autoRace":true,"sound":false,"highContrast":true,"reducedMotion":true,"speedrunEnabled":true,"alwaysOnTop":false}}),
+            json!({"type":"resetStatistics","confirmed":true}),
+            json!({"type":"resetAll","confirmed":true}),
+        ] {
+            assert!(validate(&command).is_ok(), "{command}");
+        }
+    }
+    #[test]
+    fn rejects_invalid_resume_identifiers_and_extra_fields() {
+        for id in [Value::Null, json!(""), json!("x".repeat(257)), json!(12)] {
+            assert!(validate(&json!({"type":"resumeGame","gameId":id})).is_err());
+        }
+        assert!(
+            validate(&json!({"type":"resumeGame","gameId":"saved-game","path":"private"})).is_err()
+        );
+        assert!(validate(&json!({"type":"resumeGame","gameId":"x".repeat(256)})).is_ok());
+    }
     #[test]
     fn validates_known_commands_without_arbitrary_privileged_payload() {
         assert!(validate(&json!({"type":"submitGuess","word":"APPLE","randomUnit":0.2})).is_ok());

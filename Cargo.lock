@@ -573,6 +573,7 @@ dependencies = [
  "clawdle-local-runtime",
  "serde",
  "serde_json",
+ "tempfile",
  "uuid",
 ]
 
