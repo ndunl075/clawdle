@@ -99,6 +99,8 @@ export interface AppState {
     tombstones: string[];
 }
 export type Command = ({
+    type: 'resumeGame';gameId:string;
+} | {
     type: 'startDaily';
 } | {
     type: 'startEndless';
