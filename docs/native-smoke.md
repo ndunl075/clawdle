@@ -33,3 +33,21 @@ Measured app SHA-256: `9FCE7C4F903390DA2FA14FA76AAA524DB051FD725CA8BE9F914ADAE54
 Measured bridge SHA-256: `84D722FE2EC64F753DF6A6BB74D161FAE3E5945F86B1A715C8B62B7313E96392`.
 
 These hashes identify the measured build before the later durable test-profile initialization change. The script supplied its own isolated WebView2 environment for this run. This evidence covers synthetic local protocol execution only, with the limitations above.
+
+## Final installer verification
+
+The final offline installer was installed into `.local/installed-smoke` on Windows 11 Home 10.0.26200 on 2026-10-12. The existing host WebView2 runtime was present. Installation returned exit code 0; this does not prove installation on a clean machine without that runtime.
+
+The installed binaries passed the same protocol and read-only journal checks with 39 expected events. Three warmup processes preceded 30 measured hook processes: min **24.32 ms**, nearest-rank p95 **31.68 ms**, max **31.92 ms**. The app used a fresh `.local/native-smoke-final` test profile. No real Claude hooks or models were invoked.
+
+Installed app SHA-256: `7E9618C043BE89F0E553D935DEA8D8438589C86F383F26DFC4912ABB03FF9FAA`.
+
+Installed bridge SHA-256: `84D722FE2EC64F753DF6A6BB74D161FAE3E5945F86B1A715C8B62B7313E96392`.
+
+Final standard installer SHA-256: `360e6d5833febe1c26f86ab02eb522f126f6c47c67290b36f114cfec2c8af737`.
+
+Final offline installer SHA-256: `10a88a646d3fec627da17e35d851f8ca737910b7f3b0d772d9322f5c6a1d753d`.
+
+At 16:31 UTC, a 10.005-second idle sample of the installed app and all six WebView2 descendants measured **407.17 MiB summed working set**, **185.75 MiB private bytes**, and **0.00 seconds reported CPU time**. The workload was the initial Daily checkpoint after the synthetic protocol smoke, with no input or animation during the sample. Process ancestry was captured before sampling and all seven processes remained alive at its end. Summed working sets can double-count shared pages; this is a short host-specific sample, not a sustained idle CPU guarantee. The architecture's below-150-MB working-set aim was **not met**. Cold launch and warm auto-show presentation remain unmeasured.
+
+The smoke helper selects the first executable resolved for Python, so a second Windows Store Python alias on PATH does not combine two paths into an invalid command.
