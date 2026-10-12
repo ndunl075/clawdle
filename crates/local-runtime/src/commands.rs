@@ -7,7 +7,7 @@ pub fn validate(v: &Value) -> Result<(), String> {
         .ok_or("command_type")?;
     let extra: &[&str] = match kind {
         "startDaily" | "startEndless" | "giveUp" | "leaveRace" | "startSpeedrun" | "skipWord"
-        | "tick" | "interruptTiming" => &[],
+        | "tick" | "interruptTiming" | "enterRaceMode" => &[],
         "resumeGame" => {
             if !v["gameId"]
                 .as_str()
@@ -86,6 +86,7 @@ mod tests {
             "skipWord",
             "tick",
             "interruptTiming",
+            "enterRaceMode",
         ] {
             assert!(validate(&json!({"type":kind})).is_ok(), "{kind}");
         }
