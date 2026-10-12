@@ -3,8 +3,6 @@ name: Native performance (non-gating)
 # a trend/sanity signal, not release acceptance evidence. Never a required check.
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/perf-hidden-ci-b6e4d3] # TEMP: remove before merge
   schedule:
     - cron: '17 6 * * 1'
 permissions:
