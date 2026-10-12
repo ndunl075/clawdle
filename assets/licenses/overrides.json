@@ -1,0 +1,1588 @@
+{
+  "@esbuild/aix-ppc64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/android-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/android-arm@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/android-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/darwin-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/darwin-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/freebsd-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/freebsd-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-arm@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-ia32@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-loong64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-mips64el@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-ppc64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-riscv64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-s390x@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/linux-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/netbsd-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/netbsd-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/openbsd-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/openbsd-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/openharmony-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/sunos-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/win32-arm64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/win32-ia32@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@esbuild/win32-x64@0.27.7": {
+    "license": "MIT",
+    "repository": "git+https://github.com/evanw/esbuild.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned esbuild@0.27.7 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681.txt",
+        "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681",
+        "sourceUrl": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@humanfs/types@0.15.0": {
+    "license": "Apache-2.0",
+    "repository": "https://github.com/humanwhocodes/humanfs",
+    "reason": "Published package lacks local conventional notice files or is optional on this host; retained full notices from its integrity-verified tarball or exact npm gitHead upstream revision.",
+    "notices": [
+      {
+        "file": "notice-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "sourceUrl": "https://raw.githubusercontent.com/humanwhocodes/humanfs/85069f193cbacc371c3beb649ce746f8c5a493be/packages/core/LICENSE",
+        "originalFile": "packages/core/LICENSE"
+      }
+    ]
+  },
+  "@napi-rs/lzma-linux-x64-gnu@1.5.1": {
+    "license": "MIT",
+    "repository": "https://github.com/Brooooooklyn/lzma",
+    "reason": "Optional Linux development binary is not shipped in Clawdle. Upstream package and exact gitHead repository f164df92d83e095f195d628b1a68a141ae2eb638 supply an MIT declaration but no license file. Retain exact published package attribution plus separately identified full standard MIT terms from SPDX license-list-data v3.27.0.",
+    "notices": [
+      {
+        "file": "notice-578e2a50ae69cd627c2953f8fa677efbf89f3087efeafff2db65aa31b81dc136.txt",
+        "sha256": "578e2a50ae69cd627c2953f8fa677efbf89f3087efeafff2db65aa31b81dc136",
+        "sourceUrl": "https://registry.npmjs.org/@napi-rs/lzma-linux-x64-gnu/-/lzma-linux-x64-gnu-1.5.1.tgz#package/package.json",
+        "originalFile": "package.json author and MIT declaration"
+      },
+      {
+        "file": "notice-b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5.txt",
+        "sha256": "b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5",
+        "sourceUrl": "https://raw.githubusercontent.com/spdx/license-list-data/v3.27.0/text/MIT.txt",
+        "originalFile": "SPDX MIT full standard terms"
+      }
+    ]
+  },
+  "@rollup/rollup-android-arm-eabi@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-android-arm64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-darwin-arm64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-darwin-x64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-freebsd-arm64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-freebsd-x64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-arm-gnueabihf@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-arm-musleabihf@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-arm64-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-arm64-musl@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-loong64-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-loong64-musl@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-ppc64-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-ppc64-musl@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-riscv64-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-riscv64-musl@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-s390x-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-x64-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-linux-x64-musl@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-openbsd-x64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-openharmony-arm64@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-win32-arm64-msvc@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-win32-ia32-msvc@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-win32-x64-gnu@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@rollup/rollup-win32-x64-msvc@4.64.5": {
+    "license": "MIT",
+    "repository": "git+https://github.com/rollup/rollup.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned rollup@4.64.5 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8.txt",
+        "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8",
+        "sourceUrl": "https://registry.npmjs.org/rollup/-/rollup-4.64.5.tgz#LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "@tauri-apps/cli-darwin-arm64@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-darwin-x64@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-linux-arm-gnueabihf@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-linux-arm64-gnu@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-linux-arm64-musl@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-linux-riscv64-gnu@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-linux-x64-gnu@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-linux-x64-musl@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-win32-arm64-msvc@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-win32-ia32-msvc@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "@tauri-apps/cli-win32-x64-msvc@2.10.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "git+https://github.com/tauri-apps/tauri.git",
+    "reason": "Platform-specific binary package stores project notices in its pinned @tauri-apps/cli@2.10.0 companion distribution.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_APACHE-2.0",
+        "originalFile": "LICENSE_APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://registry.npmjs.org/@tauri-apps/cli/-/cli-2.10.0.tgz#LICENSE_MIT",
+        "originalFile": "LICENSE_MIT"
+      }
+    ]
+  },
+  "crate:alloc-stdlib@0.3.0": {
+    "license": "BSD-3-Clause",
+    "repository": "https://github.com/dropbox/rust-alloc-no-stdlib",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae.txt",
+        "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae",
+        "sourceUrl": "https://raw.githubusercontent.com/dropbox/rust-alloc-no-stdlib/0a81fd6928ea3b33c8cd484aa4575d50ffb98012/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:block2@0.6.2": {
+    "license": "MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/b4167b582b2f75f9a1be75495c41b765344fd03c/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:clipboard-win@5.4.1": {
+    "license": "BSL-1.0",
+    "repository": "https://github.com/DoumanAsh/clipboard-win",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566.txt",
+        "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+        "sourceUrl": "https://raw.githubusercontent.com/DoumanAsh/clipboard-win/3b27cf2bfd1adcfa6e0264eb51c1025ddaf0f342/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:defmt-parser@1.0.0": {
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/knurling-rs/defmt",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90.txt",
+        "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+        "sourceUrl": "https://raw.githubusercontent.com/knurling-rs/defmt/4a8cdb44891ed57b8ff5a023b6bec7137c48708f/LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-2710a622a896bba67356913d4d0492cab5465f61b2ecce6d880aeb483834fb50.txt",
+        "sha256": "2710a622a896bba67356913d4d0492cab5465f61b2ecce6d880aeb483834fb50",
+        "sourceUrl": "https://raw.githubusercontent.com/knurling-rs/defmt/4a8cdb44891ed57b8ff5a023b6bec7137c48708f/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:dispatch2@0.3.1": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/8852b424193ca41602281b3d7540d7c8ed51e49a/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:dlopen2@0.8.2": {
+    "license": "MIT",
+    "repository": "https://github.com/OpenByteDev/dlopen2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-39fa265207450e77c62e90c5594a06c085b655d8374c7ced4bf7894b6bd95dd2.txt",
+        "sha256": "39fa265207450e77c62e90c5594a06c085b655d8374c7ced4bf7894b6bd95dd2",
+        "sourceUrl": "https://raw.githubusercontent.com/OpenByteDev/dlopen2/cc80e4a0a90d499b677fdf7743699b4b3a43a989/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:dlopen2_derive@0.4.3": {
+    "license": "MIT",
+    "repository": "https://github.com/OpenByteDev/dlopen2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-39fa265207450e77c62e90c5594a06c085b655d8374c7ced4bf7894b6bd95dd2.txt",
+        "sha256": "39fa265207450e77c62e90c5594a06c085b655d8374c7ced4bf7894b6bd95dd2",
+        "sourceUrl": "https://raw.githubusercontent.com/OpenByteDev/dlopen2/cc80e4a0a90d499b677fdf7743699b4b3a43a989/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:jni-sys-macros@0.4.1": {
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/jni-rs/jni-sys",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08.txt",
+        "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08",
+        "sourceUrl": "https://raw.githubusercontent.com/jni-rs/jni-sys/64d77b7a5f119d7b55b4e2c169a4668067ff59e6/LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-1d85bd754b04ceec93e98e890edd1fa3c6a22e81bcb32135806beeccefa51cd1.txt",
+        "sha256": "1d85bd754b04ceec93e98e890edd1fa3c6a22e81bcb32135806beeccefa51cd1",
+        "sourceUrl": "https://raw.githubusercontent.com/jni-rs/jni-sys/64d77b7a5f119d7b55b4e2c169a4668067ff59e6/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:libappindicator-sys@0.9.0": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "",
+    "reason": "License files live in the pinned libappindicator 0.9.0 companion crate at the same upstream commit eafd1e3682a1247f595410266091e9684021cb6f.",
+    "notices": [
+      {
+        "file": "notice-a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2.txt",
+        "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "sourceUrl": "https://static.crates.io/crates/libappindicator/libappindicator-0.9.0.crate#LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-eb227437252b2a7a9c1fc342c93ade1f3d7ce38cc6dd754f613db07d53ceff0b.txt",
+        "sha256": "eb227437252b2a7a9c1fc342c93ade1f3d7ce38cc6dd754f613db07d53ceff0b",
+        "sourceUrl": "https://static.crates.io/crates/libappindicator/libappindicator-0.9.0.crate#LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:mac-notification-sys@0.6.15": {
+    "license": "MIT/Apache-2.0",
+    "repository": "https://github.com/h4llow3En/mac-notification-sys",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1.txt",
+        "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "sourceUrl": "https://raw.githubusercontent.com/h4llow3En/mac-notification-sys/deb559683962d314a7693478476bf8d052efa84e/LICENSE-Apache",
+        "originalFile": "LICENSE-Apache"
+      },
+      {
+        "file": "notice-1299b4d9d15e9d67e4ac0e7d47ae9404887ca3cf0764aadeec7588d5a6e8e0cc.txt",
+        "sha256": "1299b4d9d15e9d67e4ac0e7d47ae9404887ca3cf0764aadeec7588d5a6e8e0cc",
+        "sourceUrl": "https://raw.githubusercontent.com/h4llow3En/mac-notification-sys/deb559683962d314a7693478476bf8d052efa84e/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:ndk-context@0.1.1": {
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/rust-windowing/android-ndk-rs",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "sourceUrl": "https://raw.githubusercontent.com/rust-windowing/android-ndk-rs/10f2ba388fca20f7349996ebae26ccda7a6fda5c/LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1.txt",
+        "sha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+        "sourceUrl": "https://raw.githubusercontent.com/rust-windowing/android-ndk-rs/10f2ba388fca20f7349996ebae26ccda7a6fda5c/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:ndk-sys@0.6.0+11769913": {
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/rust-mobile/ndk",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "sourceUrl": "https://raw.githubusercontent.com/rust-mobile/ndk/49bbbba16c58ff63cb8a0ad0eca5a9fb7ecaec25/LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1.txt",
+        "sha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+        "sourceUrl": "https://raw.githubusercontent.com/rust-mobile/ndk/49bbbba16c58ff63cb8a0ad0eca5a9fb7ecaec25/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:ndk@0.9.0": {
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/rust-mobile/ndk",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4.txt",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "sourceUrl": "https://raw.githubusercontent.com/rust-mobile/ndk/49bbbba16c58ff63cb8a0ad0eca5a9fb7ecaec25/LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1.txt",
+        "sha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+        "sourceUrl": "https://raw.githubusercontent.com/rust-mobile/ndk/49bbbba16c58ff63cb8a0ad0eca5a9fb7ecaec25/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:objc2-app-kit@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-cloud-kit@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-core-data@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-core-foundation@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-core-graphics@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-core-image@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-core-location@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-core-text@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-encode@4.1.0": {
+    "license": "MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/8d214f5477365ffcbcbb7de058c86ed9a518efb7/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-exception-helper@0.1.1": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/8d214f5477365ffcbcbb7de058c86ed9a518efb7/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-foundation@0.3.2": {
+    "license": "MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-io-surface@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-quartz-core@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-ui-kit@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-user-notifications@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2-web-kit@0.3.2": {
+    "license": "Zlib OR Apache-2.0 OR MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/7b1abfd750a2cacaea71d6a56ecfb83cb7de560b/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:objc2@0.6.5": {
+    "license": "MIT",
+    "repository": "https://github.com/madsmtm/objc2",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54.txt",
+        "sha256": "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54",
+        "sourceUrl": "https://raw.githubusercontent.com/madsmtm/objc2/d7d2fa23ceaa5e6096c923b081040e5d81b3b9df/LICENSE.md",
+        "originalFile": "LICENSE.md"
+      }
+    ]
+  },
+  "crate:r-efi@5.3.0": {
+    "license": "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+    "repository": "https://github.com/r-efi/r-efi",
+    "reason": "Full MIT alternative and author copyright notices are in AUTHORS; distribution selects the MIT alternative.",
+    "notices": [
+      {
+        "file": "notice-ff92bed461f50338dd703a9ba9aee496a425957873df1d91192776e4bdf5dda7.txt",
+        "sha256": "ff92bed461f50338dd703a9ba9aee496a425957873df1d91192776e4bdf5dda7",
+        "sourceUrl": "https://raw.githubusercontent.com/r-efi/r-efi/97b55bed1c2c91dcbf787674849f05337ff80b33/AUTHORS",
+        "originalFile": "AUTHORS"
+      }
+    ]
+  },
+  "crate:r-efi@6.0.0": {
+    "license": "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+    "repository": "https://github.com/r-efi/r-efi",
+    "reason": "Full MIT alternative and author copyright notices are in AUTHORS; distribution selects the MIT alternative.",
+    "notices": [
+      {
+        "file": "notice-d027e91dbc9cdbb2f1190068e498bd6b61cff022b6a032b191021ba658d96111.txt",
+        "sha256": "d027e91dbc9cdbb2f1190068e498bd6b61cff022b6a032b191021ba658d96111",
+        "sourceUrl": "https://raw.githubusercontent.com/r-efi/r-efi/7e1b0322d31d625f81a5656096330934f9cd835d/AUTHORS",
+        "originalFile": "AUTHORS"
+      }
+    ]
+  },
+  "crate:selectors@0.38.0": {
+    "license": "MPL-2.0",
+    "repository": "https://github.com/servo/stylo",
+    "reason": "Crate source identifies MPL-2.0. Complete license and original lib.rs notices retained. Corresponding unmodified source: https://github.com/servo/stylo/tree/572ecba2d1600e7c3d490586692a209faf703baa/selectors .",
+    "notices": [
+      {
+        "file": "notice-3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04.txt",
+        "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
+        "sourceUrl": "https://www.mozilla.org/media/MPL/2.0/index.txt",
+        "originalFile": "MPL-2.0.txt"
+      },
+      {
+        "file": "notice-d54c6e13e9e952dac17d209171df8657e3cae93beaddace4906150cdec8d02e9.txt",
+        "sha256": "d54c6e13e9e952dac17d209171df8657e3cae93beaddace4906150cdec8d02e9",
+        "sourceUrl": "https://raw.githubusercontent.com/servo/stylo/572ecba2d1600e7c3d490586692a209faf703baa/selectors/lib.rs",
+        "originalFile": "selectors/lib.rs (source and MPL notice)"
+      }
+    ]
+  },
+  "crate:tauri-plugin@2.7.1": {
+    "license": "Apache-2.0 OR MIT",
+    "repository": "https://github.com/tauri-apps/tauri",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594.txt",
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "sourceUrl": "https://raw.githubusercontent.com/tauri-apps/tauri/30da1fd6e17de6107ecc850c95dfb16b5729f2dd/LICENSE-APACHE-2.0",
+        "originalFile": "LICENSE-APACHE-2.0"
+      },
+      {
+        "file": "notice-9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d.txt",
+        "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+        "sourceUrl": "https://raw.githubusercontent.com/tauri-apps/tauri/30da1fd6e17de6107ecc850c95dfb16b5729f2dd/LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      },
+      {
+        "file": "notice-5e834fe9788c524210deda859c46a550ffa5aa0cba9ea0572f0d81120e97c008.txt",
+        "sha256": "5e834fe9788c524210deda859c46a550ffa5aa0cba9ea0572f0d81120e97c008",
+        "sourceUrl": "https://raw.githubusercontent.com/tauri-apps/tauri/30da1fd6e17de6107ecc850c95dfb16b5729f2dd/LICENSE.spdx",
+        "originalFile": "LICENSE.spdx"
+      }
+    ]
+  },
+  "crate:webview2-com-macros@0.8.1": {
+    "license": "MIT",
+    "repository": "https://github.com/wravery/webview2-rs",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73.txt",
+        "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73",
+        "sourceUrl": "https://raw.githubusercontent.com/wravery/webview2-rs/dffa41a8a46d3f5565eefbff2de57d38d399f158/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:webview2-com-sys@0.39.1": {
+    "license": "MIT",
+    "repository": "https://github.com/wravery/webview2-rs",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73.txt",
+        "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73",
+        "sourceUrl": "https://raw.githubusercontent.com/wravery/webview2-rs/edc2caf886175ccaebe86078c9cfe1ae2a187328/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:webview2-com@0.39.1": {
+    "license": "MIT",
+    "repository": "https://github.com/wravery/webview2-rs",
+    "reason": "Published crate omits workspace-root license files; retained from its exact .cargo_vcs_info.json upstream commit.",
+    "notices": [
+      {
+        "file": "notice-0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73.txt",
+        "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73",
+        "sourceUrl": "https://raw.githubusercontent.com/wravery/webview2-rs/edc2caf886175ccaebe86078c9cfe1ae2a187328/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "crate:winapi-i686-pc-windows-gnu@0.4.0": {
+    "license": "MIT/Apache-2.0",
+    "repository": "https://github.com/retep998/winapi-rs",
+    "reason": "Import-library companion package excludes project-root notices; retained copyright and dual license from pinned winapi 0.3.9 of the same upstream project.",
+    "notices": [
+      {
+        "file": "notice-b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1.txt",
+        "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "sourceUrl": "https://static.crates.io/crates/winapi/winapi-0.3.9.crate#LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b.txt",
+        "sha256": "ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b",
+        "sourceUrl": "https://static.crates.io/crates/winapi/winapi-0.3.9.crate#LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "crate:winapi-x86_64-pc-windows-gnu@0.4.0": {
+    "license": "MIT/Apache-2.0",
+    "repository": "https://github.com/retep998/winapi-rs",
+    "reason": "Import-library companion package excludes project-root notices; retained copyright and dual license from pinned winapi 0.3.9 of the same upstream project.",
+    "notices": [
+      {
+        "file": "notice-b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1.txt",
+        "sha256": "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "sourceUrl": "https://static.crates.io/crates/winapi/winapi-0.3.9.crate#LICENSE-APACHE",
+        "originalFile": "LICENSE-APACHE"
+      },
+      {
+        "file": "notice-ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b.txt",
+        "sha256": "ce7bc3499fee93d5022ef430d5e4201e79a6d9154f3974e42f41349f0569e09b",
+        "sourceUrl": "https://static.crates.io/crates/winapi/winapi-0.3.9.crate#LICENSE-MIT",
+        "originalFile": "LICENSE-MIT"
+      }
+    ]
+  },
+  "esrecurse@4.3.0": {
+    "license": "BSD-2-Clause",
+    "repository": "",
+    "reason": "Published package contains complete license and copyright in README.md instead of a LICENSE file.",
+    "notices": [
+      {
+        "file": "notice-cb1764d4708e870cc694de13d499af2e6ee98d2751026e3a3f79de608f4f4ea0.txt",
+        "sha256": "cb1764d4708e870cc694de13d499af2e6ee98d2751026e3a3f79de608f4f4ea0",
+        "sourceUrl": "https://registry.npmjs.org/esrecurse/-/esrecurse-4.3.0.tgz#README.md",
+        "originalFile": "README.md license section"
+      }
+    ]
+  },
+  "fsevents@2.3.3": {
+    "license": "MIT",
+    "repository": "https://github.com/fsevents/fsevents",
+    "reason": "Published package lacks local conventional notice files or is optional on this host; retained full notices from its integrity-verified tarball or exact npm gitHead upstream revision.",
+    "notices": [
+      {
+        "file": "notice-2a8a5d6197bb97a018b8a190dd3ed853d750ca87c8e80c17aad41d6c6ff448e1.txt",
+        "sha256": "2a8a5d6197bb97a018b8a190dd3ed853d750ca87c8e80c17aad41d6c6ff448e1",
+        "sourceUrl": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz#package/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "imurmurhash@0.1.4": {
+    "license": "MIT",
+    "repository": "",
+    "reason": "Published package contains complete license and copyright in README.md instead of a LICENSE file.",
+    "notices": [
+      {
+        "file": "notice-338b862a4b5959b1583d99ab35801b23375150693c6cc3bf8fcd9156a0e25ddd.txt",
+        "sha256": "338b862a4b5959b1583d99ab35801b23375150693c6cc3bf8fcd9156a0e25ddd",
+        "sourceUrl": "https://registry.npmjs.org/imurmurhash/-/imurmurhash-0.1.4.tgz#README.md",
+        "originalFile": "README.md license section"
+      }
+    ]
+  },
+  "keyv@4.5.4": {
+    "license": "MIT",
+    "repository": "https://github.com/jaredwray/keyv",
+    "reason": "Published package declares MIT but omits LICENSE and gitHead. Retained the project-root MIT notice at historical source snapshot a4272b2a47f31d7248080dc72c08421d2ef0b663 immediately before npm publication (2023-10-07), including both original authors Luke Childs and Jared Wray.",
+    "notices": [
+      {
+        "file": "notice-1f7dca26d2d328c3dbb9b6fe3b15ec3cda08ffe2288e47b73d617454b256f959.txt",
+        "sha256": "1f7dca26d2d328c3dbb9b6fe3b15ec3cda08ffe2288e47b73d617454b256f959",
+        "sourceUrl": "https://raw.githubusercontent.com/jaredwray/keyv/a4272b2a47f31d7248080dc72c08421d2ef0b663/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "natural-compare@1.4.0": {
+    "license": "MIT",
+    "repository": "https://github.com/litejs/natural-compare-lite",
+    "reason": "Pinned README contains original 2012-2015 copyright and links the author MIT license URL; both the original copyright and complete linked license are retained with frozen checksums.",
+    "notices": [
+      {
+        "file": "notice-353fe762ba595bf1ffe786acf0f5984bb164205901d74f258af195fc8228c67d.txt",
+        "sha256": "353fe762ba595bf1ffe786acf0f5984bb164205901d74f258af195fc8228c67d",
+        "sourceUrl": "https://lauri.rooden.ee/mit-license.txt",
+        "originalFile": "author-referenced MIT license"
+      },
+      {
+        "file": "notice-b1a41a2bed2722f10267002c9cc5d3675622962ad8487c4de28ee720ac92bd2e.txt",
+        "sha256": "b1a41a2bed2722f10267002c9cc5d3675622962ad8487c4de28ee720ac92bd2e",
+        "sourceUrl": "https://raw.githubusercontent.com/litejs/natural-compare-lite/eec83eee67cfac84d6db30cdd65363f155673770/README.md",
+        "originalFile": "README.md original copyright"
+      }
+    ]
+  },
+  "saxes@6.0.0": {
+    "license": "ISC",
+    "repository": "https://github.com/lddubeau/saxes",
+    "reason": "Published package lacks local conventional notice files or is optional on this host; retained full notices from its integrity-verified tarball or exact npm gitHead upstream revision.",
+    "notices": [
+      {
+        "file": "notice-0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e.txt",
+        "sha256": "0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e",
+        "sourceUrl": "https://raw.githubusercontent.com/lddubeau/saxes/211fa0ebec9b628affc09219199639887174bfc3/LICENSE",
+        "originalFile": "LICENSE"
+      }
+    ]
+  },
+  "stackback@0.0.2": {
+    "license": "MIT",
+    "repository": "https://github.com/shtylman/node-stackback",
+    "reason": "Development-only upstream publishes MIT declaration and author Roman Shtylman in package.json but provides no license file in historical or current repository. Retain exact published attribution plus full standard MIT terms from SPDX license-list-data v3.27.0; SPDX text is identified separately, not represented as an upstream copyright notice.",
+    "notices": [
+      {
+        "file": "notice-4d984909b27d37d2f1a379b9cda7292a6e3a133c076df166d740a17514ac6e60.txt",
+        "sha256": "4d984909b27d37d2f1a379b9cda7292a6e3a133c076df166d740a17514ac6e60",
+        "sourceUrl": "https://registry.npmjs.org/stackback/-/stackback-0.0.2.tgz#package/package.json",
+        "originalFile": "package.json author and MIT declaration"
+      },
+      {
+        "file": "notice-b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5.txt",
+        "sha256": "b05785f9f18e6716bab63424b11454513b9943a222595b70411009202fc592b5",
+        "sourceUrl": "https://raw.githubusercontent.com/spdx/license-list-data/v3.27.0/text/MIT.txt",
+        "originalFile": "SPDX MIT full standard terms"
+      }
+    ]
+  }
+}

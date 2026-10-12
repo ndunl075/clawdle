@@ -18,6 +18,10 @@ jobs:
         with:
           node-version-file: .node-version
           cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+      - run: node scripts/release-preflight.mjs
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
@@ -44,6 +48,8 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.90.0'
       - uses: Swatinem/rust-cache@v2
       - run: pnpm install --frozen-lockfile
       - run: cargo test --workspace --locked
@@ -52,3 +58,4 @@ jobs:
         with:
           name: windows-standard-installer
           path: target/release/bundle/nsis/*.exe
+          if-no-files-found: error

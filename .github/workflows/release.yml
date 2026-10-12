@@ -15,8 +15,14 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.90.0'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
       - uses: Swatinem/rust-cache@v2
       - run: pnpm install --frozen-lockfile
+      - run: node scripts/release-preflight.mjs --require-tag --require-windows
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
@@ -25,19 +31,25 @@ jobs:
       - run: pnpm contracts:generate --check
       - run: pnpm exec playwright install chromium
       - run: pnpm test:e2e
+      - run: pnpm build:web
       - run: pnpm build:desktop
       - shell: pwsh
         run: |
           New-Item -ItemType Directory -Path release -Force
-          Get-ChildItem target/release/bundle/nsis/*.exe | Copy-Item -Destination release
+          $installers = @(Get-ChildItem -LiteralPath target/release/bundle/nsis -Filter *.exe)
+          if ($installers.Count -ne 1) { throw 'Expected exactly one standard NSIS installer' }
+          Move-Item -LiteralPath $installers[0].FullName -Destination (Join-Path release "Clawdle-${env:GITHUB_REF_NAME}-windows-x64-setup.exe")
       - run: pnpm build:desktop:offline
       - shell: pwsh
         run: |
-          Get-ChildItem target/release/bundle/nsis/*.exe | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path release ($_.BaseName + '-offline.exe')) }
+          $installers = @(Get-ChildItem -LiteralPath target/release/bundle/nsis -Filter *.exe)
+          if ($installers.Count -ne 1) { throw 'Expected exactly one offline NSIS installer' }
+          Move-Item -LiteralPath $installers[0].FullName -Destination (Join-Path release "Clawdle-${env:GITHUB_REF_NAME}-windows-x64-offline-setup.exe")
       - run: node scripts/checksums.mjs release
       - uses: softprops/action-gh-release@v2
         with:
           draft: true
+          fail_on_unmatched_files: true
           files: release/*
           body: |
             Windows x64 per-user installers. Standard installation may download WebView2 on a fresh PC. Choose the offline installer when the runtime cannot be downloaded.
