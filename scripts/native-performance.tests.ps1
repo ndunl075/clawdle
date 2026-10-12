@@ -42,6 +42,22 @@ Check 'final status failed wins' ((Get-FinalReportStatus -Failure 'x' -Unverifie
 Check 'unverified observations forbid completed' ((Get-FinalReportStatus -Failure $null -UnverifiedObservations 1) -eq 'incomplete')
 Check 'clean run completed' ((Get-FinalReportStatus -Failure $null -UnverifiedObservations 0) -eq 'completed')
 
+Check 'visible launch has no arguments and presentation visible' (@(Get-LaunchArguments).Count -eq 0 -and (Get-Presentation) -eq 'visible')
+Check 'hook launch passes only --hook-launch and presentation hidden' ((@(Get-LaunchArguments -HookLaunch) -join '|') -eq '--hook-launch' -and (Get-Presentation -HookLaunch) -eq 'hidden')
+Check 'hidden target is 120 MiB' ((Get-PrivateBytesTarget -Presentation 'hidden') -eq 120MB)
+Check 'visible target is 200 MiB' ((Get-PrivateBytesTarget -Presentation 'visible') -eq 200MB)
+Check 'hidden at target passes' ((Test-PrivateBytesTarget -PeakPrivateBytes 120MB -Presentation 'hidden') -eq $true)
+Check 'hidden over target fails' ((Test-PrivateBytesTarget -PeakPrivateBytes (120MB + 1) -Presentation 'hidden') -eq $false)
+Check '150 MiB passes visible but fails hidden' ((Test-PrivateBytesTarget -PeakPrivateBytes 150MB -Presentation 'visible') -eq $true -and (Test-PrivateBytesTarget -PeakPrivateBytes 150MB -Presentation 'hidden') -eq $false)
+Check 'missing peak gives no verdict' ($null -eq (Test-PrivateBytesTarget -PeakPrivateBytes $null -Presentation 'visible'))
+$okRun = [pscustomobject]@{privateBytesTargetPass = $true}
+$badRun = [pscustomobject]@{privateBytesTargetPass = $false}
+$openRun = [pscustomobject]@{privateBytesTargetPass = $null}
+Check 'report passes only when completed and all launches pass' ((Get-ReportTargetPass -Runs @($okRun, $okRun) -Status 'completed') -eq $true)
+Check 'one failing launch fails the report' ((Get-ReportTargetPass -Runs @($okRun, $badRun) -Status 'completed') -eq $false)
+Check 'unmeasured launch cannot pass' ((Get-ReportTargetPass -Runs @($okRun, $openRun) -Status 'completed') -eq $false)
+Check 'incomplete or failed report has no verdict' ($null -eq (Get-ReportTargetPass -Runs @($okRun) -Status 'incomplete') -and $null -eq (Get-ReportTargetPass -Runs @($okRun) -Status 'failed'))
+
 # Real fallback against this very process (no launch): same creation time -> path; wrong creation time -> exited.
 $self = Get-Process -Id $PID
 $ok = Resolve-ProcessPathFallback -ProcessId $PID -CreationDate $self.StartTime

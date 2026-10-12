@@ -1,0 +1,83 @@
+name: Native performance (non-gating)
+# Measurement only. Windows Server runner, NOT Windows 11 hardware: results are
+# a trend/sanity signal, not release acceptance evidence. Never a required check.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: native-performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  measure:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      CLAWDLE_PERF_RUNNER_NOTE: GitHub-hosted windows-latest (Windows Server runner, not Windows 11)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.90.0'
+      - uses: Swatinem/rust-cache@v2
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:desktop
+      - name: Self-test harness
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/native-performance.tests.ps1
+      - name: Runner details
+        shell: pwsh
+        run: |
+          [Environment]::OSVersion.VersionString
+          (Get-CimInstance Win32_OperatingSystem | Select-Object Caption,BuildNumber | Format-List | Out-String)
+          whoami
+          Get-Item target/release/clawdle-desktop.exe | Select-Object FullName,Length
+      - name: Measure visible
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/native-performance.ps1 `
+            -App (Join-Path $PWD 'target/release/clawdle-desktop.exe') `
+            -DataDir (Join-Path $PWD '.local/native-smoke-ci-visible') `
+            -Launches 3 -DurationSeconds 60
+      - name: Measure hidden (--hook-launch)
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/native-performance.ps1 `
+            -App (Join-Path $PWD 'target/release/clawdle-desktop.exe') `
+            -DataDir (Join-Path $PWD '.local/native-smoke-ci-hidden') `
+            -Launches 3 -DurationSeconds 60 -HookLaunch
+      - name: Summary
+        if: always()
+        shell: pwsh
+        run: |
+          foreach ($name in 'visible','hidden') {
+            $path = ".local/native-smoke-ci-$name/performance.json"
+            if (-not (Test-Path $path)) { continue }
+            $r = Get-Content $path -Raw | ConvertFrom-Json
+            "### $name ($($r.status)) pass=$($r.privateBytesTargetPass) target=$([math]::Round($r.privateBytesTargetBytes/1MB)) MiB" | Add-Content $env:GITHUB_STEP_SUMMARY
+            foreach ($run in $r.runs) {
+              "- launch $($run.launch): peak private $([math]::Round($run.peakPrivateBytes/1MB,1)) MiB, mean $([math]::Round($run.meanPrivateBytes/1MB,1)) MiB, peak WS (info) $([math]::Round($run.peakWorkingSetBytes/1MB,1)) MiB, status $($run.status)" | Add-Content $env:GITHUB_STEP_SUMMARY
+            }
+          }
+          "Windows Server runner, not Windows 11; non-gating." | Add-Content $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-performance-windows-server-runner
+          path: |
+            .local/native-smoke-ci-visible/performance.json
+            .local/native-smoke-ci-visible/progress.json
+            .local/native-smoke-ci-hidden/performance.json
+            .local/native-smoke-ci-hidden/progress.json
+          if-no-files-found: warn

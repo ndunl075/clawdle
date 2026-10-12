@@ -5,6 +5,7 @@ param(
     [Parameter(Mandatory)][string]$App,
     [Parameter(Mandatory)][string]$DataDir,
     [string]$Python = 'python',
+    [switch]$HookLaunch,
     [ValidateRange(1,10)][int]$Launches = 3,
     [ValidateRange(10,3600)][int]$DurationSeconds = 60,
     [ValidateRange(100,10000)][int]$SampleIntervalMs = 1000,
@@ -50,6 +51,9 @@ $marker = Join-Path $fixture 'harness-owner.json'
 @{runId=$runId;app=$appPath;ownerSid=$ownerSid} | ConvertTo-Json | Set-Content -LiteralPath $marker -Encoding utf8
 $dictionary = Join-Path $repo 'packages/game/src/words.generated.json'
 Assert-PlainPath $dictionary
+$presentation = Get-Presentation -HookLaunch:$HookLaunch
+$launchArguments = @(Get-LaunchArguments -HookLaunch:$HookLaunch)
+$privateTargetBytes = Get-PrivateBytesTarget -Presentation $presentation
 $logicalProcessors = [Environment]::ProcessorCount
 $results = [Collections.Generic.List[object]]::new()
 $reportPath = Join-Path $fixture 'performance.json'
@@ -92,7 +96,11 @@ function Save-Progress([string]$Phase) {
 }
 function Save-Report {
     Write-FixtureJson $reportPath ([ordered]@{format='clawdle-native-performance-v1';updatedUtc=[DateTimeOffset]::UtcNow.ToString('o');
-        status=$reportStatus;app=$appPath;appSha256=$appSha256;
+        status=$reportStatus;presentation=$presentation;launchArguments=$launchArguments;
+        primaryMetric='summed private bytes (native process + WebView2 children)';
+        privateBytesTargetBytes=$privateTargetBytes;privateBytesTargetPass=(Get-ReportTargetPass -Runs @($results.ToArray()) -Status $reportStatus);
+        runnerNote=$env:CLAWDLE_PERF_RUNNER_NOTE;
+        app=$appPath;appSha256=$appSha256;
         powershellVersion=$PSVersionTable.PSVersion.ToString();pythonVersion=[string]$pythonVersion;
         os=[Environment]::OSVersion.VersionString;logicalProcessors=$logicalProcessors;
         durationSeconds=$DurationSeconds;sampleIntervalMs=$SampleIntervalMs;cimTimeoutSeconds=$CimTimeoutSeconds;
@@ -102,8 +110,9 @@ function Save-Report {
             'Fresh profile per launch; later launches warm OS caches, not restored app/WebView2 profiles.',
             'Executable hashing precedes launch and can warm its OS file cache.',
             'Readiness includes polling, CIM enumeration, SQLite query, report writes and Python subprocess overhead; observation is an upper bound.',
-            'Ordinary visible launch requested but visibility is unverified; idle workload only, no typing, models, installed Claude integration or focus claim.',
-            'Working sets sum process resident bytes and can count shared pages repeatedly; private bytes are committed private memory, not resident memory.',
+            $(if($HookLaunch){'Launched with --hook-launch so the app starts hidden to tray; hidden state is requested, not independently verified by the harness. Idle workload only.'}else{'Ordinary visible launch requested but visibility is unverified; idle workload only, no typing, models, installed Claude integration or focus claim.'}),
+            'Primary metric is summed private bytes (committed private memory, not resident memory); the target pass/fail applies to the per-launch peak of that sum, with MB meaning MiB (1048576 bytes).',
+            'Working sets sum process resident bytes and can count shared pages repeatedly; they are informational only and never gate.',
             'CPU uses deltas for surviving sampled process identities; short-lived/exiting process CPU between samples can be missed.',
             'CPU mean is the arithmetic mean of sampled intervals; inspect raw elapsed times for weighted analysis.',
             'Only verified native/WebView2 descendants are included; system services, GPU driver memory and unrelated processes are excluded.',
@@ -285,6 +294,7 @@ try {
         $samples = [Collections.Generic.List[object]]::new()
         $info = [Diagnostics.ProcessStartInfo]::new($appPath)
         $info.UseShellExecute = $false
+        foreach ($argument in $launchArguments) { $info.ArgumentList.Add($argument) }
         $info.Environment['CLAWDLE_TEST_MODE']='1'
         $info.Environment['CLAWDLE_DATA_DIR']=$profile
         $info.Environment['WEBVIEW2_USER_DATA_FOLDER']=Join-Path $profile 'webview'
@@ -293,7 +303,7 @@ try {
         $activeRun = [ordered]@{launch=$launch;profile=$profile;status='starting';
             launchKind=$(if($launch -eq 1){'first process launch in this harness invocation; OS cache state uncontrolled'}else{'repeated OS-warmed launch; fresh app/WebView2 profile'});
             readinessProxyMs=$null;checkpoint=$null;runtimeEpoch=$null;measuredDurationSeconds=0;sampleCount=0;exitedObservations=0;unverifiedObservations=0;
-            peakWorkingSetBytes=$null;peakPrivateBytes=$null;meanCpuPercentMachine=$null;samples=@()}
+            peakWorkingSetBytes=$null;peakPrivateBytes=$null;meanPrivateBytes=$null;privateBytesTargetBytes=$privateTargetBytes;privateBytesTargetPass=$null;meanCpuPercentMachine=$null;samples=@()}
         $results.Add($activeRun)
         Save-Progress 'launching'
         Save-Report
@@ -349,6 +359,8 @@ try {
             $cpu = @($samples | ForEach-Object {$_.cpuPercentMachine} | Where-Object {$null -ne $_})
             $activeRun.peakWorkingSetBytes=($samples | Measure-Object workingSetBytes -Maximum).Maximum
             $activeRun.peakPrivateBytes=($samples | Measure-Object privateBytes -Maximum).Maximum
+            $activeRun.meanPrivateBytes=($samples | Measure-Object privateBytes -Average).Average
+            $activeRun.privateBytesTargetPass=Test-PrivateBytesTarget -PeakPrivateBytes $activeRun.peakPrivateBytes -Presentation $presentation
             $activeRun.meanCpuPercentMachine=($cpu | Measure-Object -Average).Average
             $activeRun.status='measured-awaiting-cleanup'
             Save-Report

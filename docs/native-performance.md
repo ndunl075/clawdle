@@ -37,3 +37,34 @@ The classification logic lives in `scripts/native-performance.lib.ps1` and is ex
 ```powershell
 powershell -NoProfile -File scripts/native-performance.tests.ps1
 ```
+
+## Hidden (tray) launch and memory targets
+
+The primary metric is **summed private bytes** across the native process and its WebView2 children (see `ARCHITECTURE.md`): at most 200 MB visible and at most 120 MB hidden to tray, where MB is MiB (1048576 bytes). Summed working set is recorded for information only and never gates.
+
+`-HookLaunch` starts the app with `--hook-launch`, so it stays hidden in the tray and never takes focus. Use it for any run on a machine someone is working on; the default launch is visible and steals focus.
+
+```powershell
+pwsh -NoProfile -File scripts/native-performance.ps1 `
+  -App 'C:bsolute\path\Clawdle.exe' `
+  -DataDir 'C:bsolute\checkout\.local
+ative-smoke-performance-hidden-001' `
+  -HookLaunch
+```
+
+Report fields added:
+
+- `presentation`: `hidden` with `-HookLaunch`, otherwise `visible`. `launchArguments` lists the arguments passed to the app. Hidden state is requested, not independently verified.
+- Per launch: `peakPrivateBytes`, `meanPrivateBytes` (over the sustained samples), `privateBytesTargetBytes`, and `privateBytesTargetPass` (peak at or under the target for the presentation). `peakWorkingSetBytes` stays informational.
+- Report level: `primaryMetric`, `privateBytesTargetBytes`, and `privateBytesTargetPass`. The latter is `true` only when the report is `completed` and every launch passed, `false` if any launch failed or was not measured, and `null` for a `running`, `failed` or `incomplete` report (no verdict).
+- `runnerNote`: free text copied from the `CLAWDLE_PERF_RUNNER_NOTE` environment variable, used by CI to label the environment.
+
+## CI measurement (non-gating)
+
+`.github/workflows/native-performance.yml` runs on `workflow_dispatch` and a weekly schedule. It builds the desktop app, then runs the harness once visible and once with `-HookLaunch`, each in a fresh `.local/native-smoke-ci-*` fixture, and uploads both `performance.json` reports as artifacts. It never gates merges. The numbers come from a **Windows Server runner (GitHub-hosted `windows-latest`), not Windows 11**, with shared virtualised hardware and uncontrolled background load: treat them as a trend and a sanity check, not release acceptance evidence. The harness's reparse-point, ownership-marker and executable-path checks run unchanged on the runner.
+
+The self-test also covers launch-argument construction, presentation, and target evaluation:
+
+```powershell
+powershell -NoProfile -File scripts/native-performance.tests.ps1
+```
