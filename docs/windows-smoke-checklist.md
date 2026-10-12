@@ -35,3 +35,7 @@ Windows 11 Home 10.0.26200. Standard and offline NSIS artifacts built. Offline a
 All 28 native tests passed. The actual synthetic packaged hook/protocol benchmark passed with 39 persisted events and 34.43 ms p95 across 30 measured hook processes; see [native-smoke.md](native-smoke.md) for hashes and limits. These automated checks do not replace the unchecked OS interactions above.
 
 Native UI helper failure: `foreground window did not report a process id`, reproduced with a refreshed window handle and normal application launch. Therefore installed GUI/focus/tray/Save As checks are not marked passed.
+
+Later native UI revalidation displayed the actual light-theme game and native Export dialog successfully; the earlier helper failure did not reproduce. A valid native export file was created and retained privately. Reliable filename selection, cancellation, IDE focus, tray and physical sleep/resume checks remain unverified. Another foreground application interfered with dialog targeting, so this partial observation is not a completed GUI acceptance run.
+
+The sustained performance attempt completed two 60-second idle intervals before a descendant-verification failure on the third launch. Partial measurements and limitations are recorded in [native-smoke.md](native-smoke.md); this failed invocation does not check off the complete performance gate.
