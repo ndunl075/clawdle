@@ -115,6 +115,8 @@ class AcceptanceTests(unittest.TestCase):
         fails(self, 'success', base(), 'unrelated_hook_not_executed', unrelated_ran=False)
         fails(self, 'success', base(), 'local_provider_request_missing_or_unexpected', requests=[])
         fails(self, 'success', base() + [(5, ev('SubagentStop', 'child', 'agent.turn_completed'))], 'unexpected_scope')
+        fails(self, 'success', base() + [(5, ev('PreToolUse', None))], 'unexpected_scope')
+        fails(self, 'subagent', base() + [(5, ev('SubagentStop', 'workspace', 'agent.turn_completed'))], 'unexpected_scope')
 
     def test_provider_error_failures(self):
         fails(self, 'provider-error', base('StopFailure'), 'provider_error_cli_exited_zero')

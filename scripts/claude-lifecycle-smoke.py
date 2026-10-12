@@ -127,6 +127,7 @@ def evaluate(scenario, events, canary, result_code=None, stdout=None, side_effec
     require(ready[0][1].get('type') == 'agent.activity' and ready[0][1].get('activityKind') == 'session_ready', 'session_ready_type_mismatch')
     require(bool(start[0][1].get('turnId')) and start[0][1]['turnId'] == stop[0][1].get('turnId'), 'turn_identity_absent_or_changed')
     require(canary not in json.dumps(events), 'private_prompt_in_journal')
+    require(all(e.get('scope') in ('root', 'child') for _, e in events), 'unexpected_scope')
     require(unrelated_ran, 'unrelated_hook_not_executed')
     require('/v1/messages' in requests and 'unexpected-path' not in requests, 'local_provider_request_missing_or_unexpected')
     checks = {'correlatedTerminal': True, 'orderedLifecycle': True, 'normalizedTypes': True, 'privatePromptAbsent': True, 'unrelatedHookExecuted': True, 'loopbackProviderObserved': True}
