@@ -24,13 +24,15 @@ export type JournalEntry = {
   "payload": unknown;
 };
 export type ClawdleExport = {
-  "schemaVersion": 1;
   "exportedAtUtc": string;
   "games": ReadonlyArray<Record<string, unknown>>;
   "results": ReadonlyArray<Record<string, unknown>>;
-  "settings"?: Record<string, unknown>;
+  "settings": Record<string, unknown>;
   "races"?: ReadonlyArray<Record<string, unknown>>;
   "speedruns"?: ReadonlyArray<Record<string, unknown>>;
   "dictionaryVersion"?: string;
   "scheduleVersion"?: string;
+  "format": "clawdle-export";
+  "version": 1;
+  "statsResetSeq": number;
 };

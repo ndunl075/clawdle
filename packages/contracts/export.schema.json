@@ -1,1 +1,64 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"ClawdleExport","type":"object","additionalProperties":false,"required":["schemaVersion","exportedAtUtc","games","results"],"properties":{"schemaVersion":{"const":1},"exportedAtUtc":{"type":"string","format":"date-time"},"games":{"type":"array","items":{"type":"object"}},"results":{"type":"array","items":{"type":"object"}},"settings":{"type":"object"},"races":{"type":"array","items":{"type":"object"}},"speedruns":{"type":"array","items":{"type":"object"}},"dictionaryVersion":{"type":"string"},"scheduleVersion":{"type":"string"}}}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ClawdleExport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "version",
+    "exportedAtUtc",
+    "games",
+    "results",
+    "settings",
+    "statsResetSeq"
+  ],
+  "properties": {
+    "exportedAtUtc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "games": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "settings": {
+      "type": "object"
+    },
+    "races": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "speedruns": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "dictionaryVersion": {
+      "type": "string"
+    },
+    "scheduleVersion": {
+      "type": "string"
+    },
+    "format": {
+      "const": "clawdle-export"
+    },
+    "version": {
+      "const": 1
+    },
+    "statsResetSeq": {
+      "minimum": 0,
+      "type": "integer"
+    }
+  }
+}
