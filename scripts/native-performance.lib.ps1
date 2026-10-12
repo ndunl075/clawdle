@@ -80,3 +80,41 @@ function Get-FinalReportStatus {
     if ($UnverifiedObservations -gt 0) { return 'incomplete' }
     return 'completed'
 }
+
+# Presentation recorded in the report: hook launches start hidden to tray, ordinary launches visible.
+function Get-Presentation {
+    param([switch]$HookLaunch)
+    if ($HookLaunch) { return 'hidden' }
+    return 'visible'
+}
+
+# Arguments passed to the app executable (never a shell string).
+function Get-LaunchArguments {
+    param([switch]$HookLaunch)
+    if ($HookLaunch) { return @('--hook-launch') }
+    return @()
+}
+
+# Summed private bytes target (MB = MiB): 120 hidden to tray, 200 visible.
+function Get-PrivateBytesTarget {
+    param([ValidateSet('hidden','visible')][string]$Presentation)
+    if ($Presentation -eq 'hidden') { return [long](120 * 1MB) }
+    return [long](200 * 1MB)
+}
+
+# True when the launch's peak summed private bytes is within target. $null when there is no peak yet.
+function Test-PrivateBytesTarget {
+    param($PeakPrivateBytes, [string]$Presentation)
+    if ($null -eq $PeakPrivateBytes) { return $null }
+    return ([long]$PeakPrivateBytes -le (Get-PrivateBytesTarget -Presentation $Presentation))
+}
+
+# Report-level pass: only a 'completed' report whose every launch measured and passed. $null until then.
+function Get-ReportTargetPass {
+    param($Runs, [string]$Status)
+    if ($Status -ne 'completed') { return $null }
+    $runs = @($Runs)
+    if ($runs.Count -eq 0) { return $null }
+    foreach ($run in $runs) { if ($run.privateBytesTargetPass -ne $true) { return $false } }
+    return $true
+}
