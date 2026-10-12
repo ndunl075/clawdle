@@ -28,7 +28,7 @@ for ($cursor=$profile; $cursor; $cursor=[IO.Path]::GetDirectoryName($cursor)) {
 $appPath = (Get-Item -LiteralPath $App).FullName
 $bridgePath = (Get-Item -LiteralPath $Bridge).FullName
 if ([IO.Path]::GetExtension($appPath) -ne '.exe' -or [IO.Path]::GetExtension($bridgePath) -ne '.exe') { throw 'App and Bridge must be native executables.' }
-$pythonPath = (Get-Command $Python -CommandType Application).Source
+$pythonPath = (Get-Command $Python -CommandType Application | Select-Object -First 1).Source
 $fixtureSession = 'clawdle-smoke-' + [Guid]::NewGuid().ToString()
 $fixtureTurn = [Guid]::NewGuid().ToString()
 $canary = 'SYNTHETIC_PRIVATE_CANARY_' + [Guid]::NewGuid().ToString('N')
