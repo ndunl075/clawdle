@@ -8,7 +8,8 @@ param(
     [ValidateRange(1,10)][int]$Launches = 3,
     [ValidateRange(10,3600)][int]$DurationSeconds = 60,
     [ValidateRange(100,10000)][int]$SampleIntervalMs = 1000,
-    [ValidateRange(5,120)][int]$ReadinessTimeoutSeconds = 30
+    [ValidateRange(5,120)][int]$ReadinessTimeoutSeconds = 30,
+    [ValidateRange(1,10)][int]$CimTimeoutSeconds = 8
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -51,6 +52,10 @@ Assert-PlainPath $dictionary
 $logicalProcessors = [Environment]::ProcessorCount
 $results = [Collections.Generic.List[object]]::new()
 $reportPath = Join-Path $fixture 'performance.json'
+$progressPath = Join-Path $fixture 'progress.json'
+$activeRun = $null
+$failure = $null
+$reportStatus = 'running'
 function Assert-FixtureOwner {
     Assert-PlainPath $marker
     $value = Get-Content -LiteralPath $marker -Raw | ConvertFrom-Json
@@ -61,12 +66,48 @@ function Assert-FixtureOwner {
 function Get-Identity($Row) {
     return "$($Row.ProcessId):$($Row.CreationDate.ToUniversalTime().Ticks)"
 }
+function Write-FixtureJson([string]$Path, $Value) {
+    Assert-FixtureOwner
+    Assert-PlainPath $Path
+    Assert-PlainPath ($Path + '.tmp')
+    $content = $Value | ConvertTo-Json -Depth 12
+    [IO.File]::WriteAllText(($Path + '.tmp'),$content,[Text.UTF8Encoding]::new($false))
+    [IO.File]::Move(($Path + '.tmp'),$Path,$true)
+}
+function Save-Progress([string]$Phase) {
+    Write-FixtureJson $progressPath ([ordered]@{updatedUtc=[DateTimeOffset]::UtcNow.ToString('o');phase=$Phase;
+        launch=$(if($null -ne $activeRun){$activeRun.launch}else{$null});
+        launchedPid=$launchedPid;
+        elapsedSeconds=$(if($null -ne $clock){$clock.Elapsed.TotalSeconds}else{$null});
+        samples=$(if($null -ne $activeRun){$activeRun.sampleCount}else{0})})
+}
+function Save-Report {
+    Write-FixtureJson $reportPath ([ordered]@{format='clawdle-native-performance-v1';updatedUtc=[DateTimeOffset]::UtcNow.ToString('o');
+        status=$reportStatus;app=$appPath;appSha256=$appSha256;
+        powershellVersion=$PSVersionTable.PSVersion.ToString();pythonVersion=[string]$pythonVersion;
+        os=[Environment]::OSVersion.VersionString;logicalProcessors=$logicalProcessors;
+        durationSeconds=$DurationSeconds;sampleIntervalMs=$SampleIntervalMs;cimTimeoutSeconds=$CimTimeoutSeconds;
+        failure=$failure;runs=@($results.ToArray());
+        readinessMetric='process launch to observed durable valid initial daily puzzle checkpoint; NOT visible pixels or interactive readiness';
+        limitations=@('No cold boot claim: OS caches, antivirus, background load and hardware are uncontrolled.',
+            'Fresh profile per launch; later launches warm OS caches, not restored app/WebView2 profiles.',
+            'Executable hashing precedes launch and can warm its OS file cache.',
+            'Readiness includes polling, CIM enumeration, SQLite query, report writes and Python subprocess overhead; observation is an upper bound.',
+            'Ordinary visible launch requested but visibility is unverified; idle workload only, no typing, models, installed Claude integration or focus claim.',
+            'Working sets sum process resident bytes and can count shared pages repeatedly; private bytes are committed private memory, not resident memory.',
+            'CPU uses deltas for surviving sampled process identities; short-lived/exiting process CPU between samples can be missed.',
+            'CPU mean is the arithmetic mean of sampled intervals; inspect raw elapsed times for weighted analysis.',
+            'Only verified native/WebView2 descendants are included; system services, GPU driver memory and unrelated processes are excluded.',
+            'CIM and Python inspection plus partial report writes consume harness resources outside the app process tree.',
+            'Running or failed partial reports are diagnostic evidence, not completed acceptance measurements.')})
+}
 function Assert-ProcessOwner($Row) {
-    $owner = Invoke-CimMethod -InputObject $Row -MethodName GetOwnerSid
+    $owner = Invoke-CimMethod -InputObject $Row -MethodName GetOwnerSid -OperationTimeoutSec $CimTimeoutSeconds
     if ($owner.ReturnValue -ne 0 -or $owner.Sid -ne $ownerSid) { throw 'Process owner is not the current user.' }
 }
 function Update-Tree {
-    $rows = @(Get-CimInstance Win32_Process)
+    Save-Progress 'enumerating-process-tree'
+    $rows = @(Get-CimInstance Win32_Process -Property ProcessId,ParentProcessId,CreationDate,ExecutablePath -OperationTimeoutSec $CimTimeoutSeconds)
     $liveIdentities = @{}
     foreach ($row in $rows) { $liveIdentities[(Get-Identity $row)] = $true }
     $rootRow = $rows | Where-Object { $_.ProcessId -eq $started.Id } | Select-Object -First 1
@@ -115,7 +156,7 @@ function Get-Sample([Diagnostics.Stopwatch]$Clock) {
                     workingSetBytes=$process.WorkingSet64;privateBytes=$process.PrivateMemorySize64;cpuSeconds=$process.TotalProcessorTime.TotalSeconds})
             } finally { $process.Dispose() }
         } catch {
-            $current = Get-CimInstance Win32_Process -Filter "ProcessId=$($row.ProcessId)" | Select-Object -First 1
+            $current = Get-CimInstance Win32_Process -Filter "ProcessId=$($row.ProcessId)" -OperationTimeoutSec $CimTimeoutSeconds | Select-Object -First 1
             if ($null -eq $current -or (Get-Identity $current) -ne (Get-Identity $row)) { continue }
             throw # A live process with unreadable counters must not silently disappear from totals.
         }
@@ -138,23 +179,31 @@ function Stop-OwnedTree {
     Assert-FixtureOwner
     # Discover before terminating the root. Never use Kill(entireProcessTree),
     # process names, or endpoint PIDs as authority for termination.
-    $null = Update-Tree
+    Save-Progress 'cleanup-snapshot'
+    $currentRows = @(Update-Tree)
+    $currentByIdentity = @{}
+    foreach ($row in $currentRows) { $currentByIdentity[(Get-Identity $row)] = $row }
     $identities = @($owned.Values | Sort-Object @{Expression={if($_.ProcessId -eq $started.Id){0}else{1}}},CreationDate -Descending)
     # Stop root first so it cannot intentionally create more browser children.
     $identities = @($identities | Sort-Object @{Expression={if($_.ProcessId -eq $started.Id){0}else{1}}})
     foreach ($known in $identities) {
-        $current = Get-CimInstance Win32_Process -Filter "ProcessId=$($known.ProcessId)" | Select-Object -First 1
-        if ($null -eq $current -or (Get-Identity $current) -ne (Get-Identity $known)) { continue }
+        $current = $currentByIdentity[(Get-Identity $known)]
+        if ($null -eq $current) { continue }
         if (-not $current.ExecutablePath -or $current.ExecutablePath -ne $known.ExecutablePath) { throw 'Process path changed; refusing termination.' }
-        Assert-ProcessOwner $current
+        Save-Progress "cleanup-verifying-pid-$($known.ProcessId)"
         $process = Get-Process -Id $current.ProcessId -ErrorAction SilentlyContinue
         if ($process) {
             try {
                 $null = $process.SafeHandle # Keep a handle to this identity; a recycled PID must not become a kill target.
-                if ([Math]::Abs(($process.StartTime.ToUniversalTime()-$known.CreationDate.ToUniversalTime()).TotalMilliseconds) -le 10) {
-                    $process.Kill()
-                    if (-not $process.WaitForExit(5000)) { throw 'Owned process failed to exit.' }
-                }
+                if ([Math]::Abs(($process.StartTime.ToUniversalTime()-$known.CreationDate.ToUniversalTime()).TotalMilliseconds) -gt 10) { continue }
+                if (-not $process.Path.Equals($known.ExecutablePath,[StringComparison]::OrdinalIgnoreCase)) { throw 'Live process path changed; refusing termination.' }
+                Assert-ProcessOwner $current
+                Save-Progress "cleanup-stopping-pid-$($known.ProcessId)"
+                $process.Kill()
+                if (-not $process.WaitForExit(5000)) { throw 'Owned process failed to exit.' }
+            } catch {
+                if ($process.HasExited) { continue }
+                throw
             } finally { $process.Dispose() }
         }
     }
@@ -187,7 +236,12 @@ except (sqlite3.Error,ValueError,KeyError,AssertionError,TypeError,OSError):
     pass
 print(json.dumps(result))
 '@
-$failure = $null
+$started = $null
+$launchedPid = $null
+$clock = $null
+$appSha256 = (Get-FileHash -LiteralPath $appPath -Algorithm SHA256).Hash
+Save-Progress 'prepared'
+Save-Report
 try {
     for ($launch=1; $launch -le $Launches; $launch++) {
         Assert-FixtureOwner
@@ -204,9 +258,18 @@ try {
         $info.Environment['CLAWDLE_DATA_DIR']=$profile
         $info.Environment['WEBVIEW2_USER_DATA_FOLDER']=Join-Path $profile 'webview'
         $info.WorkingDirectory=[IO.Path]::GetDirectoryName($appPath)
-        $clock = [Diagnostics.Stopwatch]::StartNew()
+        $clock = [Diagnostics.Stopwatch]::new()
+        $activeRun = [ordered]@{launch=$launch;profile=$profile;status='starting';
+            launchKind=$(if($launch -eq 1){'first process launch in this harness invocation; OS cache state uncontrolled'}else{'repeated OS-warmed launch; fresh app/WebView2 profile'});
+            readinessProxyMs=$null;checkpoint=$null;runtimeEpoch=$null;measuredDurationSeconds=0;sampleCount=0;
+            peakWorkingSetBytes=$null;peakPrivateBytes=$null;meanCpuPercentMachine=$null;samples=@()}
+        $results.Add($activeRun)
+        Save-Progress 'launching'
+        Save-Report
         try {
+            $clock.Start()
             $started = [Diagnostics.Process]::Start($info)
+            $launchedPid=$started.Id
             $ready = $null
             $endpoint = $null
             while ($null -eq $ready) {
@@ -225,6 +288,7 @@ try {
                     }
                 }
                 if ($null -ne $endpoint -and (Test-Path -LiteralPath $databasePath)) {
+                    Save-Progress 'checking-puzzle-checkpoint'
                     $proof = & $pythonPath -c $inspection $databasePath $dictionary
                     if ($LASTEXITCODE -ne 0) { throw 'Read-only checkpoint inspection failed.' }
                     $candidate = $proof | ConvertFrom-Json
@@ -234,42 +298,41 @@ try {
                 Start-Sleep -Milliseconds 100
             }
             $readinessMs = $clock.Elapsed.TotalMilliseconds
+            $activeRun.readinessProxyMs=$readinessMs
+            $activeRun.checkpoint=$ready
+            $activeRun.runtimeEpoch=$endpoint.runtimeEpoch
+            $activeRun.status='measuring'
+            Save-Progress 'measuring-baseline'
             $null = Get-Sample $clock # Baseline excluded from sustained interval.
             $measureStart = $clock.Elapsed.TotalSeconds
             while (($clock.Elapsed.TotalSeconds-$measureStart) -lt $DurationSeconds) {
                 Start-Sleep -Milliseconds $SampleIntervalMs
                 if ($started.HasExited) { throw 'App exited during sustained measurement.' }
                 $samples.Add((Get-Sample $clock))
+                $activeRun.measuredDurationSeconds=$clock.Elapsed.TotalSeconds-$measureStart
+                $activeRun.sampleCount=$samples.Count
+                $activeRun.samples=@($samples.ToArray())
+                Save-Progress 'sustained-sample-saved'
+                Save-Report
             }
             $cpu = @($samples | ForEach-Object {$_.cpuPercentMachine} | Where-Object {$null -ne $_})
-            $results.Add([ordered]@{launch=$launch;profile=$profile;
-                launchKind=$(if($launch -eq 1){'first process launch in this harness invocation; OS cache state uncontrolled'}else{'repeated OS-warmed launch; fresh app/WebView2 profile'});
-                readinessProxyMs=$readinessMs;checkpoint=$ready;runtimeEpoch=$endpoint.runtimeEpoch;
-                measuredDurationSeconds=($clock.Elapsed.TotalSeconds-$measureStart);sampleCount=$samples.Count;
-                peakWorkingSetBytes=($samples | Measure-Object workingSetBytes -Maximum).Maximum;
-                peakPrivateBytes=($samples | Measure-Object privateBytes -Maximum).Maximum;
-                meanCpuPercentMachine=($cpu | Measure-Object -Average).Average;samples=@($samples.ToArray())})
+            $activeRun.peakWorkingSetBytes=($samples | Measure-Object workingSetBytes -Maximum).Maximum
+            $activeRun.peakPrivateBytes=($samples | Measure-Object privateBytes -Maximum).Maximum
+            $activeRun.meanCpuPercentMachine=($cpu | Measure-Object -Average).Average
+            $activeRun.status='measured-awaiting-cleanup'
+            Save-Report
         } finally {
             if ($started) { try { Stop-OwnedTree } finally { $started.Dispose() } }
         }
+        $activeRun.status='completed'
+        $started=$null
+        $launchedPid=$null
+        Save-Progress 'launch-completed'
+        Save-Report
     }
-} catch { $failure=$_.Exception.Message }
-Assert-FixtureOwner
-[ordered]@{format='clawdle-native-performance-v1';createdUtc=[DateTimeOffset]::UtcNow.ToString('o');
-    app=$appPath;appSha256=(Get-FileHash -LiteralPath $appPath -Algorithm SHA256).Hash;
-    powershellVersion=$PSVersionTable.PSVersion.ToString();pythonVersion=[string]$pythonVersion;
-    os=[Environment]::OSVersion.VersionString;logicalProcessors=$logicalProcessors;
-    durationSeconds=$DurationSeconds;sampleIntervalMs=$SampleIntervalMs;failure=$failure;runs=@($results.ToArray());
-    readinessMetric='process launch to observed durable valid initial daily puzzle checkpoint; NOT visible pixels or interactive readiness';
-    limitations=@('No cold boot claim: OS caches, antivirus, background load and hardware are uncontrolled.',
-        'Fresh profile per launch; later launches warm OS caches, not restored app/WebView2 profiles.',
-        'Readiness includes polling, CIM enumeration, SQLite query and Python subprocess overhead; observation is an upper bound.',
-        'Ordinary visible launch requested but visibility is unverified; idle workload only, no typing, models, installed Claude integration or focus claim.',
-        'Working sets sum process resident bytes and can count shared pages repeatedly; private bytes are committed private memory, not resident memory.',
-        'CPU uses deltas for surviving sampled process identities; short-lived/exiting process CPU between samples can be missed.',
-        'CPU mean is the arithmetic mean of sampled intervals; inspect raw elapsed times for weighted analysis.',
-        'Only verified native/WebView2 descendants are included; system services, GPU driver memory and unrelated processes are excluded.',
-        'CIM and Python inspection consume harness resources outside the app process tree.')
-} | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $reportPath -Encoding utf8
+} catch { $failure=$_.Exception.Message; if($null -ne $activeRun){$activeRun.status='failed'} }
+$reportStatus=if($failure){'failed'}else{'completed'}
+Save-Progress $reportStatus
+Save-Report
 Write-Output $reportPath
 if ($failure) { throw $failure }
