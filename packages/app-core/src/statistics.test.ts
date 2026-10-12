@@ -1,0 +1,9 @@
+import { describe, expect, it } from 'vitest';
+import { emptyState, type ResultRow } from './types';
+import { deriveStatistics } from './statistics';
+function win(key: string, seq: number): ResultRow { return { resultId: `result:daily:${seq}`, identity: key, mode: 'daily', payload: { outcome: 'solved', won: true, ranked: true, guessCount: 3, elapsedMs: null, dailyKey: key, finishedAtUtc: `${key}T12:00:00Z` } }; }
+describe('derived statistics', () => {
+    it('computes UTC streaks across missing days and keeps races isolated', () => { const s = emptyState(); s.results = [win('2026-10-09', 1), win('2026-10-11', 2), win('2026-10-12', 3)]; s.results.push({ ...win('2026-10-10', 4), mode: 'race' }); const stats = deriveStatistics(s, 'daily', Date.parse('2026-10-12T23:59:59Z')); expect(stats.currentStreak).toBe(2); expect(stats.longestStreak).toBe(2); expect(stats.distribution).toEqual([0, 0, 3, 0, 0, 0]); });
+    it('allows yesterday to anchor a pending today but a today loss breaks the streak', () => { const s = emptyState(); s.results = [win('2026-10-11', 1)]; const now = Date.parse('2026-10-12T12:00:00Z'); expect(deriveStatistics(s, 'daily', now).currentStreak).toBe(1); s.results.push({ ...win('2026-10-12', 2), payload: { ...win('2026-10-12', 2).payload, won: false, outcome: 'exhausted' } }); expect(deriveStatistics(s, 'daily', now).currentStreak).toBe(0); });
+    it('excludes neutral races from percentage and invalid timing from best', () => { const s = emptyState(); s.results = [{ ...win('2026-10-11', 1), mode: 'race' }, { ...win('2026-10-12', 2), mode: 'race', payload: { ...win('2026-10-12', 2).payload, ranked: false, won: false, outcome: 'interrupted' } }]; const stats = deriveStatistics(s, 'race'); expect(stats.winPercentage).toBe(100); expect(stats.neutral).toBe(1); expect(stats.fastestMs).toBeNull(); });
+});
