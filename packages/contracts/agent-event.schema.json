@@ -1,0 +1,23 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://clawdle.local/contracts/agent-event-v1",
+  "title":"AgentEvent",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["protocolVersion","eventId","provider","sessionId","turnId","scope","type","sourceEvent","observedAtUtc","projectKey"],
+  "properties":{
+    "protocolVersion":{"const":1},
+    "eventId":{"type":"string","format":"uuid"},
+    "provider":{"const":"claude"},
+    "sessionId":{"type":"string","minLength":1,"maxLength":256},
+    "turnId":{"type":["string","null"],"minLength":1,"maxLength":256},
+    "scope":{"enum":["root","child"]},
+    "type":{"enum":["agent.started","agent.activity","agent.needs_attention","agent.turn_completed","agent.session_ended"]},
+    "sourceEvent":{"enum":["SessionStart","UserPromptSubmit","PreToolUse","PostToolUse","PermissionRequest","Notification","Stop","StopFailure","SessionEnd","SubagentStop"]},
+    "observedAtUtc":{"type":"string","format":"date-time"},
+    "projectKey":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
+    "attentionKind":{"enum":["permission","input"]},
+    "activityKind":{"enum":["session_ready","tool_started","tool_finished"]},
+    "endReason":{"enum":["closed","interrupted","provider_error","unknown"]}
+  }
+}
