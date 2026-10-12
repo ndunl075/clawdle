@@ -16,6 +16,7 @@ use tauri_plugin_notification::NotificationExt;
 mod export;
 #[cfg(windows)]
 mod power;
+mod test_profile;
 struct Native {
     repo: Arc<Repository>,
     dir: PathBuf,
@@ -304,6 +305,7 @@ fn geometry(app: &tauri::AppHandle, dir: &std::path::Path) {
     }
 }
 fn main() {
+    test_profile::configure().expect("Unable to prepare isolated test browser profile");
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, args, _| {
             if !args.iter().any(|a| a == "--hook-launch") {
