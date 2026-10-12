@@ -25,10 +25,16 @@ export class AppController {
     private validateRecovery() {
         if (this.state.schemaVersion !== 1 || !this.state.games || !Array.isArray(this.state.results))
             throw new Error('Unsupported saved profile; original storage has been preserved');
+        const s=this.state; const record=(v:unknown)=>typeof v==='object'&&v!==null&&!Array.isArray(v);
+        if(!record(s.games)||!record(s.races)||!record(s.speedruns)||!record(s.gameAnchors)||!record(s.settings)||!Array.isArray(s.recentWordIds)||!Array.isArray(s.tombstones)||!Number.isSafeInteger(s.statsResetSeq))throw new Error('Saved profile needs recovery; original storage has been preserved');
+        if(!Object.values(s.settings).every(v=>typeof v==='boolean')||!s.recentWordIds.every(v=>typeof v==='string')||!s.tombstones.every(v=>typeof v==='string'))throw new Error('Saved settings need recovery; original storage has been preserved');
+        for(const row of s.results){if(!row||typeof row.resultId!=='string'||typeof row.identity!=='string'||!row.payload||typeof row.payload.won!=='boolean'||typeof row.payload.ranked!=='boolean'||!Number.isFinite(row.payload.guessCount)||(row.payload.elapsedMs!==null&&(!Number.isFinite(row.payload.elapsedMs)||row.payload.elapsedMs<0)))throw new Error('Saved results need recovery; original storage has been preserved');}
+        for(const r of Object.values(s.races))if(!r||!['offered','running','terminal'].includes(r.state)||typeof r.raceId!=='string'||typeof r.runtimeEpoch!=='string'||typeof r.gameId!=='string'||typeof r.provider!=='string'||typeof r.sessionId!=='string'||typeof r.turnId!=='string'||!Number.isSafeInteger(r.startedSeq)||!Number.isSafeInteger(r.lastSeq)||typeof r.ranked!=='boolean'||!Number.isFinite(r.startedMonoMs))throw new Error('Saved races need recovery; original storage has been preserved');
+        for(const run of Object.values(s.speedruns))if(!run||!['running','finished','interrupted'].includes(run.status)||!Number.isFinite(run.deadlineMonoMs)||!Number.isFinite(run.solved))throw new Error('Saved timed runs need recovery; original storage has been preserved');
         this.state.quarantinedGames ??= {};
         for (const [id, value] of Object.entries(this.state.games)) {
             const checked = validateSavedPuzzle(value);
-            if (checked.valid)
+            if (checked.valid&&checked.puzzle.gameId===id)
                 this.state.games[id] = checked.puzzle;
             else {
                 this.state.quarantinedGames[id] = value;
@@ -45,13 +51,13 @@ export class AppController {
             listener();
     }
     private serialize<T>(fn: () => Promise<T>): Promise<T> { const next = this.queue.then(fn, fn); this.queue = next.catch(() => { }); return next; }
-    refresh(): Promise<void> { return this.serialize(() => this.consume()); }
+    refresh(): Promise<void> { return this.serialize(async()=>{try{await this.consume();this.error=null}catch(error){this.error=error instanceof Error?error.message:'Unable to recover saved moves';this.publish();throw error}}); }
     dispatch(command: Command, actionId = this.platform.id()): Promise<void> {
         return this.serialize(async () => {
             if (this.platform.readonly)
                 throw new Error('Another tab owns this profile.');
             try {
-                await this.platform.append(actionId, command);
+                if(this.error)await this.consume();await this.platform.append(actionId, command);
                 await this.consume();
                 this.error = null;
             }
@@ -65,8 +71,8 @@ export class AppController {
     private async consume() {
         const snapshot = await this.platform.snapshot();
         this.clockAnchor = { runtimeEpoch: snapshot.runtimeEpoch, monoMs: snapshot.receivedMonoMs, localMonoMs: performance.now() };
-        if ((snapshot.checkpoint?.stateVersion ?? 0) > this.state.stateVersion)
-            this.state = { ...snapshot.checkpoint!.state, stateVersion: snapshot.checkpoint!.stateVersion, processedSeq: snapshot.checkpoint!.processedSeq };
+        if ((snapshot.checkpoint?.stateVersion ?? 0) > this.state.stateVersion){
+            this.state = { ...snapshot.checkpoint!.state, stateVersion: snapshot.checkpoint!.stateVersion, processedSeq: snapshot.checkpoint!.processedSeq };this.validateRecovery();}
         if (this.platform.readonly) {
             this.publish();
             return;
@@ -215,6 +221,7 @@ export class AppController {
             s.activeSpeedrunId = null;
         };
         switch (c.type) {
+            case 'resumeGame':{const saved=s.games[c.gameId];if(!saved||saved.mode==='speedrun'){s.feedback='This saved game cannot be resumed';break;}abandon();s.activeGameId=saved.gameId;const bound=Object.values(s.races).find(r=>r.gameId===saved.gameId);if(bound){s.activeRaceId=bound.raceId;if(bound.state==='offered')s.races[bound.raceId]=reduceRace(bound,{type:'presented',seq:e.seq,utc:e.receivedAtUtc,monoMs:e.receivedMonoMs,runtimeEpoch:e.runtimeEpoch,lateJoin:true});}break;}
             case 'startDaily':
                 if (s.quarantinedGames[`daily-v1:${dailyKey(Date.parse(e.receivedAtUtc))}`]) {
                     s.feedback = 'This saved daily puzzle needs recovery';
@@ -263,10 +270,11 @@ export class AppController {
                 break;
             }
             case 'giveUp':
+                if(run&&run.status!=='running'){s.feedback='Run has ended';break;}
                 if (game) {
                     s.games[game.gameId] = giveUp(game, e.receivedAtUtc);
                     if (race) {
-                        abandon();
+                        abandon();s.activeRaceId=race.raceId;
                     }
                     else if (run) {
                         Object.assign(run, reduceSpeedrun(run, { type: 'skip', seq: e.seq, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch }));
@@ -282,14 +290,15 @@ export class AppController {
                     return;
                 if (s.activeRaceId === target.raceId && target.state === 'running')
                     return;
-                abandon();
+                const automaticallyForegrounded=s.activeRaceId===target.raceId&&s.settings.autoRace;
+                if(s.activeRaceId!==target.raceId)abandon();
                 s.activeRaceId = target.raceId;
                 s.activeGameId = target.gameId;
-                s.races[target.raceId] = reduceRace(target, { type: 'presented', seq: e.seq, utc: e.receivedAtUtc, lateJoin: c.lateJoin ?? !s.settings.autoRace, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch });
+                s.races[target.raceId] = reduceRace(target, { type: 'presented', seq: e.seq, utc: e.receivedAtUtc, lateJoin: c.lateJoin ?? !automaticallyForegrounded, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch });
                 break;
             }
             case 'leaveRace':
-                abandon();
+                abandon();if(race)s.activeRaceId=race.raceId;
                 break;
             case 'startSpeedrun':
                 if (!s.settings.speedrunEnabled) {
@@ -340,11 +349,11 @@ export class AppController {
         if (a.scope !== 'root')
             return;
         s.agentStatuses ??= {};
-        s.agentStatuses[`${a.provider}:${a.sessionId}`] = { provider: a.provider, sessionId: a.sessionId, turnId: a.turnId ?? null, status: a.type === 'agent.needs_attention' ? 'attention' : a.type === 'agent.turn_completed' ? 'completed' : a.type === 'agent.session_ended' ? 'disconnected' : 'working', lastSeq: e.seq };
-        const binding = `${a.provider}:${a.sessionId}:${a.turnId}`;
+        s.agentStatuses[JSON.stringify([a.provider,a.sessionId])] = { provider: a.provider, sessionId: a.sessionId, turnId: a.turnId ?? null, status: a.type === 'agent.needs_attention' ? 'attention' : a.type === 'agent.turn_completed' ? 'completed' : a.type === 'agent.session_ended' ? 'disconnected' : 'working', lastSeq: e.seq };
+        const binding = JSON.stringify([a.provider,a.sessionId,a.turnId]);
         if (a.type === 'agent.turn_completed' && a.turnId && !s.tombstones.includes(binding))
-            s.tombstones.push(binding);
-        if (a.type === 'agent.started' && a.turnId && !s.tombstones.includes(binding) && !Object.values(s.races).some(r => `${r.provider}:${r.sessionId}:${r.turnId}` === binding)) {
+            s.tombstones=[...s.tombstones,binding].slice(-512);
+        if (a.type === 'agent.started' && a.turnId && !s.tombstones.includes(binding) && !Object.values(s.races).some(r => JSON.stringify([r.provider,r.sessionId,r.turnId]) === binding)) {
             const id = `race:${e.eventId}`;
             const gameId = this.newPuzzle(s, e, 'race');
             s.races[id] = createRace({ raceId: id, gameId, provider: a.provider, sessionId: a.sessionId, turnId: a.turnId, startedSeq: e.seq, startedAtUtc: e.receivedAtUtc, runtimeEpoch: e.runtimeEpoch, startedMonoMs: e.receivedMonoMs });
@@ -359,7 +368,7 @@ export class AppController {
             const type = a.type === 'agent.turn_completed' ? 'completed' : a.type === 'agent.session_ended' ? 'session_ended' : a.type === 'agent.needs_attention' ? 'attention' : 'activity';
             if (type !== 'session_ended' && a.turnId !== r.turnId)
                 continue;
-            s.races[r.raceId] = reduceRace(r, { type, seq: e.seq, utc: e.receivedAtUtc, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch, provider: a.provider, sessionId: a.sessionId, ...(a.turnId ? { turnId: a.turnId } : {}), scope: 'root', ...(a.endReason ? { endReason: a.endReason } : {}) });
+            s.races[r.raceId] = reduceRace(r, { type, seq: e.seq, utc: e.receivedAtUtc, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch, provider: a.provider, sessionId: a.sessionId, ...(a.turnId&&type!=='session_ended' ? { turnId: a.turnId } : {}), scope: 'root', ...(a.endReason ? { endReason: a.endReason } : {}) });
             this.syncRace(s, e, r.raceId);
         }
     }
