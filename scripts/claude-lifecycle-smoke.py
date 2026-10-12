@@ -62,7 +62,8 @@ def planned_tool_use(scenario, data, project):
     if scenario == 'subagent':
         name = next((candidate for candidate in SUBAGENT_TOOLS if candidate in names), None)
         if name:
-            return name, {'description': 'Synthetic child', 'prompt': CHILD_MARKER, 'subagent_type': 'general-purpose'}
+            # Foreground child: a background agent ends the root turn first and reports back in a new turn.
+            return name, {'description': 'Synthetic child', 'prompt': CHILD_MARKER, 'subagent_type': 'general-purpose', 'run_in_background': False}
     return None
 
 
@@ -157,7 +158,7 @@ def evaluate(scenario, events, canary, result_code=None, stdout=None, side_effec
         require(bool(children), 'subagent_stop_not_journaled')
         require(all(e.get('type') == 'agent.turn_completed' for _, e in children), 'subagent_type_mismatch')
         require(all(e.get('type') not in ('agent.started', 'agent.session_ended') for _, e in child), 'child_event_has_root_semantics')
-        require(all(seq < stop[0][0] for seq, _ in children), 'child_stop_after_root_terminal')
+        # Async hooks are separate processes, so journal order between a child Stop and the root terminal is not Claude's order.
         require(len([1 for _, e in root if e.get('type') == 'agent.turn_completed']) == 1, 'root_terminal_count_changed')
         require(all(e.get('turnId') in (None, turn) for _, e in child), 'child_turn_mismatch')
         checks.update(childEventsScopedChild=True, rootPairUnaffectedByChild=True)
