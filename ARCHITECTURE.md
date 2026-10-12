@@ -702,7 +702,7 @@ Performance budgets to validate during development:
 | Focused interface | Smooth input and 60 fps animations where the device permits |
 | Running bridge | 95th-percentile normal delivery below 50 ms; hard 300 ms execution budget |
 | Idle tray | Near-zero sustained CPU; no continuous animation or model polling |
-| Desktop working set | Aim below 150 MB; measure native process plus WebView2 children |
+| Desktop memory | Private bytes summed over the native process plus WebView2 children: aim at most 200 MB visible and 120 MB hidden to tray. Record summed working set for information only; it double-counts shared Chromium pages and is not a gate |
 | Warm auto-show | Aim below 250 ms after a start is received |
 | Cold launch | Aim below 2 seconds; short turns remain neutral if no usable puzzle appears |
 
