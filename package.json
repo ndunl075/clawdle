@@ -1,0 +1,27 @@
+{
+  "name": "clawdle", "version": "0.1.0", "private": true,
+  "packageManager": "pnpm@10.28.2",
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "dev:web": "vite --config apps/web/vite.config.ts",
+    "dev:desktop": "pnpm --dir apps/desktop tauri dev",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:rust": "cargo test --workspace",
+    "test:e2e": "playwright test",
+    "build:web": "vite build --config apps/web/vite.config.ts",
+    "build:desktop": "pnpm --dir apps/desktop tauri build",
+    "words:generate": "node scripts/words-generate.mjs",
+    "contracts:generate": "node scripts/contracts-generate.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.2", "eslint": "9.39.2", "typescript-eslint": "8.53.1",
+    "typescript": "5.9.3", "vite": "7.3.1", "vitest": "4.0.18",
+    "@vitejs/plugin-react": "5.1.2", "@playwright/test": "1.64.0",
+    "@testing-library/react": "16.3.2", "@testing-library/jest-dom": "6.9.1",
+    "@types/react": "19.2.8", "@types/react-dom": "19.2.3", "@types/node": "22.19.7",
+    "jsdom": "27.4.0", "fake-indexeddb": "6.2.5", "@tauri-apps/cli": "2.10.0"
+  },
+  "dependencies": { "react": "19.2.4", "react-dom": "19.2.4", "zustand": "5.0.15", "@tauri-apps/api": "2.12.3" }
+}
