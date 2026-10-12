@@ -16,16 +16,27 @@ ROOT = Path(__file__).resolve().parents[1]
 WORDS = ROOT / 'assets/words'
 REVISION = '1e5b7d3a72f47a71da5d28686c1dd4b397178485'
 ARCHIVE = WORDS / 'esdb-1e5b7d3.zip'
+SOURCE_SHA256 = '83d7608fd337d67104ab4b9dc140ff2f3f07fd57f58d6692a35909b5970904eb'
+DAILY_V1_SHA256 = 'abe65c6cc9848ea2e5575dfbaa9e8034678d85e2418f46c6a6f42d324d4d2254'
 def sha(value):
     return hashlib.sha256(value).hexdigest()
 def text_json(value):
     return (json.dumps(value, ensure_ascii=True, indent=2) + '\n').encode()
 def lines(path):
     return [word.upper() for line in path.read_text().splitlines() if not line.startswith('#') for word in line.split()]
+
+def verify_frozen_inputs():
+    # Verify before extracting or executing any vendored upstream code.
+    if sha(ARCHIVE.read_bytes()) != SOURCE_SHA256:
+        raise SystemExit('Pinned ESDB source checksum mismatch; refusing extraction')
+    frozen = WORDS / 'daily-v1.json'
+    if not frozen.exists() or sha(frozen.read_bytes()) != DAILY_V1_SHA256:
+        raise SystemExit('Frozen daily-v1 checksum mismatch; publish a versioned transition instead')
 def main():
     check = argparse.ArgumentParser()
     check.add_argument('--check', action='store_true')
     args = check.parse_args()
+    verify_frozen_inputs()
     with tempfile.TemporaryDirectory(prefix='clawdle-esdb-') as tmp:
         source = Path(tmp)
         with zipfile.ZipFile(ARCHIVE) as archive:
@@ -42,8 +53,8 @@ def main():
         if any(not re.fullmatch('[A-Z]{5}',w) for w in guesses):
             raise ValueError('Invalid word')
         frozen = WORDS/'daily-v1.json'
-        # Freeze schedule permanently. Only first-time creation uses deterministic hash order.
-        daily = json.loads(frozen.read_text()) if frozen.exists() else [f'en-v1:{w.lower()}' for w in sorted(answers,key=lambda w:sha(('clawdle-daily-v1:'+w).encode()))]
+        # This published schedule is immutable, including when regenerating all manifests.
+        daily = json.loads(frozen.read_text())
         if len(daily)!=len(set(daily)) or any(w[6:].upper() not in answers for w in daily):
             raise ValueError('Schedule references missing or repeated answers')
         outputs = {

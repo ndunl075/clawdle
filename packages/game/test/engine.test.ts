@@ -42,6 +42,12 @@ describe('dictionary and immutable puzzle operations',()=>{
     expect(createHash('sha256').update(readFileSync(new URL(`assets/words/${manifest.sourceArchive}`,root))).digest('hex')).toBe(manifest.sourceChecksum);
     expect(manifest.entryCounts).toEqual({answers:answerIds.length,guesses:acceptedGuesses.size,daily:dailySchedule.length});
   });
+  it('pins source and published daily checksums independently of regenerated manifests',()=>{
+    const root=new URL('../../../',import.meta.url);
+    const hash=(path:string)=>createHash('sha256').update(readFileSync(new URL(path,root))).digest('hex');
+    expect(hash('assets/words/esdb-1e5b7d3.zip')).toBe('83d7608fd337d67104ab4b9dc140ff2f3f07fd57f58d6692a35909b5970904eb');
+    expect(hash('assets/words/daily-v1.json')).toBe('abe65c6cc9848ea2e5575dfbaa9e8034678d85e2418f46c6a6f42d324d4d2254');
+  });
 });
 describe('selection',()=>{
   it('freezes epoch, UTC midnight, pre-epoch wrap, leap dates, and schedule wrap',()=>{
