@@ -1,0 +1,12 @@
+node_modules/
+dist/
+target/
+.worktrees/
+.tools/
+.local/
+test-results/
+playwright-report/
+*.log
+*.tsbuildinfo
+.env*
+!.env.example

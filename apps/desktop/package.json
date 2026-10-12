@@ -1,0 +1,1 @@
+{"name":"@clawdle/desktop","private":true,"type":"module","scripts":{"tauri":"tauri","dev":"vite","build":"vite build"},"dependencies":{"@clawdle/ui":"workspace:*"}}
