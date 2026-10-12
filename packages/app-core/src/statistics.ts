@@ -1,3 +1,4 @@
+import {dictionaryVersion,scheduleVersion} from '@clawdle/game';
 import type { AppState, ResultRow } from './types';
 export interface Statistics {
     played: number;
@@ -41,5 +42,5 @@ export function deriveStatistics(state: AppState, mode = 'daily', nowMs = Date.n
 export function equivalentResult(a: ResultRow, b: ResultRow): boolean { return JSON.stringify(a) === JSON.stringify(b); }
 export function exportProfile(state: AppState): string {
     // Export historical play only: no live bindings, native metadata, clocks, or credentials.
-    return JSON.stringify({ format: 'clawdle-export', version: 1, exportedAtUtc: new Date().toISOString(), games: Object.values(state.games).map(({ gameId, mode, rulesVersion, dictionaryVersion, wordId, guesses, status, startedAtUtc, finishedAtUtc, elapsedMs, timingValid, dailyKey, speedrunId }) => ({ gameId, mode, rulesVersion, dictionaryVersion, wordId, guesses, status, startedAtUtc, finishedAtUtc, elapsedMs, timingValid, dailyKey, speedrunId })), results: state.results, settings: state.settings, statsResetSeq: state.statsResetSeq }, null, 2);
+    return JSON.stringify({ format: 'clawdle-export', version: 1,dictionaryVersion,scheduleVersion, exportedAtUtc: new Date().toISOString(), games: Object.values(state.games).map(({ gameId, mode, rulesVersion, dictionaryVersion, wordId, guesses, status, startedAtUtc, finishedAtUtc, elapsedMs, timingValid, dailyKey, speedrunId }) => ({ gameId, mode, rulesVersion, dictionaryVersion, wordId, guesses, status, startedAtUtc, finishedAtUtc, elapsedMs, timingValid, dailyKey, speedrunId })), results: state.results,races:Object.values(state.races).map(({raceId,gameId,provider,startedAtUtc,endedAtUtc,outcome,guessCountAtEnd,playerSolvedBeforeBoundary,continuedPuzzleSolved,ranked,unrankedReason,elapsedMs})=>({raceId,gameId,provider,startedAtUtc,endedAtUtc,outcome,guessCountAtEnd,playerSolvedBeforeBoundary,continuedPuzzleSolved,ranked,unrankedReason,elapsedMs})),speedruns:Object.values(state.speedruns).map(({speedrunId,durationMs,solved,status,startedAtUtc,finishedAtUtc})=>({speedrunId,durationMs,solved,status:status==='running'?'interrupted':status,startedAtUtc,finishedAtUtc})), settings: state.settings, statsResetSeq: state.statsResetSeq }, null, 2);
 }

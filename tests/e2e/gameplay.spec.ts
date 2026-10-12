@@ -73,3 +73,21 @@ test('agent-first race keeps remaining guesses and never reverses its outcome',a
   expect(await page.evaluate(()=>window.clawdleFixture.outcome())).toBe('agent_first');
   expect(await page.evaluate(()=>window.clawdleFixture.results())).toBe(1);
 });
+
+test('UTC rollover offers a new daily without replacing the unfinished board',async({page})=>{
+  await page.clock.install({time:new Date('2026-10-12T23:59:55Z')});
+  await page.goto('/');await typeWord(page,'APPLE');
+  await page.clock.fastForward(6000);
+  await expect(page.getByText(/NO. 1 · Oct 12 UTC/)).toBeVisible();
+  await page.getByRole('button',{name:/Today.s puzzle is ready/}).click();
+  await expect(page.getByText(/NO. 2 · Oct 13 UTC/)).toBeVisible();
+  await page.getByRole('button',{name:'Settings',exact:true}).click();
+  await page.getByRole('button',{name:/Resume a saved puzzle/}).click();
+  await expect(page.getByRole('button',{name:/Daily · 2026-10-12 · 1\/6 guesses/})).toBeVisible();
+});
+test('compact desktop viewport keeps the complete keyboard visible',async({page})=>{
+  await page.setViewportSize({width:420,height:619});await page.goto('/');
+  const lastKey=page.getByRole('button',{name:'Delete letter'});
+  await expect(lastKey).toBeVisible();
+  const bounds=await lastKey.boundingBox();expect(bounds!.y+bounds!.height).toBeLessThanOrEqual(619);
+});

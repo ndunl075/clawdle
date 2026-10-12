@@ -98,7 +98,7 @@ export interface AppState {
     }>;
     tombstones: string[];
 }
-export type Command = ({
+export type Command = ({type:'enterRaceMode'} | {
     type: 'resumeGame';gameId:string;
 } | {
     type: 'startDaily';
