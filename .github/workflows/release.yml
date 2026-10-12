@@ -1,0 +1,57 @@
+name: Package Windows release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.90.0'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.10'
+      - uses: Swatinem/rust-cache@v2
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/release-preflight.mjs --require-tag --require-windows
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: cargo test --workspace --locked
+      - run: python scripts/words-generate.py --check
+      - run: pnpm contracts:generate --check
+      - run: pnpm exec playwright install chromium
+      - run: pnpm test:e2e
+      - run: pnpm build:web
+      - run: pnpm build:desktop
+      - shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release -Force
+          $installers = @(Get-ChildItem -LiteralPath target/release/bundle/nsis -Filter *.exe)
+          if ($installers.Count -ne 1) { throw 'Expected exactly one standard NSIS installer' }
+          Move-Item -LiteralPath $installers[0].FullName -Destination (Join-Path release "Clawdle-${env:GITHUB_REF_NAME}-windows-x64-setup.exe")
+      - run: pnpm build:desktop:offline
+      - shell: pwsh
+        run: |
+          $installers = @(Get-ChildItem -LiteralPath target/release/bundle/nsis -Filter *.exe)
+          if ($installers.Count -ne 1) { throw 'Expected exactly one offline NSIS installer' }
+          Move-Item -LiteralPath $installers[0].FullName -Destination (Join-Path release "Clawdle-${env:GITHUB_REF_NAME}-windows-x64-offline-setup.exe")
+      - run: node scripts/checksums.mjs release
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          fail_on_unmatched_files: true
+          files: release/*
+          body: |
+            Windows x64 per-user installers. Standard installation may download WebView2 on a fresh PC. Choose the offline installer when the runtime cannot be downloaded.
+
+            Compare SHA256SUMS.txt before installation. This draft must pass the packaged Windows smoke checklist before publication. Unsigned downloads may show system trust warnings.

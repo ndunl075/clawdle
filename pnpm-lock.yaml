@@ -88,6 +88,8 @@ importers:
         specifier: workspace:*
         version: link:../game
 
+  packages/contracts: {}
+
   packages/game: {}
 
   packages/platform-desktop:

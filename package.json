@@ -4,7 +4,7 @@
   "engines": { "node": ">=22.12" },
   "scripts": {
     "dev:web": "vite --config apps/web/vite.config.ts",
-    "dev:desktop": "pnpm --dir apps/desktop tauri dev",
+    "dev:desktop": "pnpm --dir apps/desktop tauri dev --config src-tauri/tauri.dev.conf.json",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
@@ -14,7 +14,8 @@
     "build:desktop": "node scripts/build-desktop.mjs",
     "build:desktop:offline": "node scripts/build-desktop.mjs --offline",
     "words:generate": "python scripts/words-generate.py",
-    "contracts:generate": "node scripts/contracts-generate.mjs"
+    "contracts:generate": "node scripts/contracts-generate.mjs",
+    "licenses:generate": "node scripts/licenses-generate.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2", "eslint": "9.39.2", "typescript-eslint": "8.53.1",
