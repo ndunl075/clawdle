@@ -17,6 +17,7 @@ mod export;
 #[cfg(windows)]
 mod power;
 mod test_profile;
+mod webview_memory;
 struct Native {
     repo: Arc<Repository>,
     dir: PathBuf,
@@ -90,6 +91,7 @@ fn show(app: &tauri::AppHandle, explicit: bool) -> Result<(), String> {
     let window = app.get_webview_window("main").ok_or("window_missing")?;
     if explicit {
         window.show().map_err(|_| "window_show")?;
+        webview_memory::apply(app, webview_memory::Transition::Shown);
         window.set_focus().map_err(|_| "window_focus")?;
     } else {
         #[cfg(windows)]
@@ -110,6 +112,7 @@ fn show(app: &tauri::AppHandle, explicit: bool) -> Result<(), String> {
                     SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE,
                 );
             }
+            webview_memory::apply(app, webview_memory::Transition::Shown);
         }
         #[cfg(not(windows))]
         {
@@ -146,7 +149,9 @@ fn native_hide(app: tauri::AppHandle) -> Result<(), String> {
     app.get_webview_window("main")
         .ok_or("window_missing")?
         .hide()
-        .map_err(|_| "window_hide".into())
+        .map_err(|_| "window_hide")?;
+    webview_memory::apply(&app, webview_memory::Transition::Hidden);
+    Ok(())
 }
 #[tauri::command]
 fn native_clipboard(app: tauri::AppHandle, text: String) -> Result<(), String> {
@@ -416,7 +421,9 @@ fn main() {
                     .try_state::<Native>()
                     .is_some_and(|s| lifecycle::background_enabled(&s.dir))
                 {
-                    let _ = window.hide();
+                    if window.hide().is_ok() {
+                        webview_memory::apply(app, webview_memory::Transition::Hidden);
+                    }
                 } else {
                     stop_native(app);
                     app.exit(0);
