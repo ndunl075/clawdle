@@ -108,6 +108,7 @@ export class AppController {
             const current = await this.platform.snapshot();
             if (current.checkpoint && current.checkpoint.stateVersion !== this.state.stateVersion) {
                 this.state = { ...current.checkpoint.state, stateVersion: current.checkpoint.stateVersion, processedSeq: current.checkpoint.processedSeq };
+                this.validateRecovery();
                 await this.consume();
                 return;
             }
@@ -118,8 +119,8 @@ export class AppController {
         const current = this.state;
         if (current.settings.alwaysOnTop !== previous.settings.alwaysOnTop)
             await this.platform.alwaysOnTop?.(current.settings.alwaysOnTop);
-        const race = current.activeRaceId ? current.races[current.activeRaceId] : undefined;
-        if (race && race.state === 'offered' && current.settings.autoRace && previous.activeRaceId !== race.raceId && this.platform.showWindow) {
+        const race = Object.values(current.races).find(candidate => candidate.state === 'offered' && !previous.races[candidate.raceId]);
+        if (race && current.settings.autoRace && this.platform.showWindow) {
             if (await this.platform.claimEffect?.(`show:${race.raceId}`))
                 await this.platform.showWindow(false);
         }
@@ -214,13 +215,17 @@ export class AppController {
                 this.result(s, e, run.speedrunId, 'speedrun', 'interrupted', false, false, run.solved, null);
             }
             if (race && race.state !== 'terminal') {
-                s.races[race.raceId] = reduceRace(race, { type: 'leave', seq: e.seq, utc: e.receivedAtUtc, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch });
+                s.races[race.raceId] = reduceRace(race, { type: 'leave', seq: e.seq, utc: e.receivedAtUtc, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch,guessCount:s.games[race.gameId]?.guesses.length??0 });
                 this.syncRace(s, e, race.raceId);
             }
             s.activeRaceId = null;
             s.activeSpeedrunId = null;
         };
         switch (c.type) {
+            case 'enterRaceMode':
+                if(game?.mode==='race'&&race)break;
+                abandon();s.activeGameId=null;
+                break;
             case 'resumeGame':{const saved=s.games[c.gameId];if(!saved||saved.mode==='speedrun'){s.feedback='This saved game cannot be resumed';break;}abandon();s.activeGameId=saved.gameId;const bound=Object.values(s.races).find(r=>r.gameId===saved.gameId);if(bound){s.activeRaceId=bound.raceId;if(bound.state==='offered')s.races[bound.raceId]=reduceRace(bound,{type:'presented',seq:e.seq,utc:e.receivedAtUtc,monoMs:e.receivedMonoMs,runtimeEpoch:e.runtimeEpoch,lateJoin:true});}break;}
             case 'startDaily':
                 if (s.quarantinedGames[`daily-v1:${dailyKey(Date.parse(e.receivedAtUtc))}`]) {
@@ -344,12 +349,21 @@ export class AppController {
             sessionId: string;
             turnId?: string;
             scope: string;
+            activityKind?: string;
             endReason?: string;
         };
         if (a.scope !== 'root')
             return;
         s.agentStatuses ??= {};
-        s.agentStatuses[JSON.stringify([a.provider,a.sessionId])] = { provider: a.provider, sessionId: a.sessionId, turnId: a.turnId ?? null, status: a.type === 'agent.needs_attention' ? 'attention' : a.type === 'agent.turn_completed' ? 'completed' : a.type === 'agent.session_ended' ? 'disconnected' : 'working', lastSeq: e.seq };
+        const sessionKey=JSON.stringify([a.provider,a.sessionId]);
+        const previous=s.agentStatuses[sessionKey];
+        const turnBinding=JSON.stringify([a.provider,a.sessionId,a.turnId]);
+        const freshStart=a.type==='agent.started'&&!s.tombstones.includes(turnBinding)&&!Object.values(s.races).some(r=>JSON.stringify([r.provider,r.sessionId,r.turnId])===turnBinding);
+        // A late boundary/activity from an older turn cannot rewrite the visible current turn.
+        const currentTurnSignal=!previous||!previous.turnId||a.turnId===previous.turnId||freshStart||a.type==='agent.session_ended'||(a.type==='agent.needs_attention'&&!a.turnId);
+        if(currentTurnSignal && !(a.type==='agent.started'&&s.tombstones.includes(turnBinding)) && !(a.activityKind==='session_ready'&&previous?.turnId)){
+            s.agentStatuses[sessionKey] = { provider:a.provider,sessionId:a.sessionId,turnId:a.type==='agent.session_ended'||(a.type==='agent.needs_attention'&&!a.turnId)?previous?.turnId??a.turnId??null:a.turnId??null,status:a.type==='agent.needs_attention'?'attention':a.type==='agent.turn_completed'?(a.endReason==='provider_error'?'interrupted':'completed'):a.type==='agent.session_ended'?'disconnected':a.activityKind==='session_ready'?'ready':'working',lastSeq:e.seq };
+        }
         const binding = JSON.stringify([a.provider,a.sessionId,a.turnId]);
         if (a.type === 'agent.turn_completed' && a.turnId && !s.tombstones.includes(binding))
             s.tombstones=[...s.tombstones,binding].slice(-512);
@@ -368,7 +382,7 @@ export class AppController {
             const type = a.type === 'agent.turn_completed' ? 'completed' : a.type === 'agent.session_ended' ? 'session_ended' : a.type === 'agent.needs_attention' ? 'attention' : 'activity';
             if (type !== 'session_ended' && a.turnId !== r.turnId)
                 continue;
-            s.races[r.raceId] = reduceRace(r, { type, seq: e.seq, utc: e.receivedAtUtc, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch, provider: a.provider, sessionId: a.sessionId, ...(a.turnId&&type!=='session_ended' ? { turnId: a.turnId } : {}), scope: 'root', ...(a.endReason ? { endReason: a.endReason } : {}) });
+            s.races[r.raceId] = reduceRace(r, { type, seq: e.seq, utc: e.receivedAtUtc, monoMs: e.receivedMonoMs, runtimeEpoch: e.runtimeEpoch, provider: a.provider, sessionId: a.sessionId, ...(a.turnId&&type!=='session_ended' ? { turnId: a.turnId } : {}), scope: 'root',guessCount:s.games[r.gameId]?.guesses.length??0, ...(a.endReason ? { endReason: a.endReason } : {}) });
             this.syncRace(s, e, r.raceId);
         }
     }
