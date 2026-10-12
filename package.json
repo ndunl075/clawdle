@@ -11,8 +11,9 @@
     "test:rust": "cargo test --workspace",
     "test:e2e": "playwright test",
     "build:web": "vite build --config apps/web/vite.config.ts",
-    "build:desktop": "pnpm --dir apps/desktop tauri build",
-    "words:generate": "node scripts/words-generate.mjs",
+    "build:desktop": "node scripts/build-desktop.mjs",
+    "build:desktop:offline": "node scripts/build-desktop.mjs --offline",
+    "words:generate": "python scripts/words-generate.py",
     "contracts:generate": "node scripts/contracts-generate.mjs"
   },
   "devDependencies": {

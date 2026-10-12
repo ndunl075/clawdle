@@ -1,0 +1,8 @@
+* text=auto
+assets/words/* text eol=lf
+assets/licenses/* text eol=lf
+assets/licenses/ESDB-Copyright.txt -text
+packages/game/src/words.generated.json text eol=lf
+assets/words/*.zip -text
+*.png -text
+*.ico -text
