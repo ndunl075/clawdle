@@ -4,6 +4,35 @@ use std::{
     time::{Duration, Instant},
 };
 #[test]
+fn integration_background_lifecycle_uses_only_isolated_settings() {
+    let d = tempfile::tempdir().unwrap();
+    let data = d.path().join("data");
+    let first = d.path().join("first project café");
+    let second = d.path().join("second project");
+    let invoke = |action: &str, project: &std::path::Path| {
+        let result = Command::new(env!("CARGO_BIN_EXE_clawdle-bridge"))
+            .args([action, "claude", "--scope", "project", "--project"])
+            .arg(project)
+            .env("CLAWDLE_TEST_MODE", "1")
+            .env("CLAWDLE_DATA_DIR", &data)
+            .output()
+            .unwrap();
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+    };
+    assert!(!clawdle_local_runtime::lifecycle::background_enabled(&data));
+    invoke("install", &first);
+    invoke("install", &second);
+    assert!(clawdle_local_runtime::lifecycle::background_enabled(&data));
+    invoke("uninstall", &first);
+    assert!(clawdle_local_runtime::lifecycle::background_enabled(&data));
+    invoke("uninstall", &second);
+    assert!(!clawdle_local_runtime::lifecycle::background_enabled(&data));
+}
+#[test]
 fn malformed_hook_is_silent_and_successful() {
     let mut child = Command::new(env!("CARGO_BIN_EXE_clawdle-bridge"))
         .args(["hook", "--provider", "claude"])

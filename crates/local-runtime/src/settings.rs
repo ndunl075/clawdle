@@ -229,6 +229,31 @@ pub fn owned_count(path: &Path, manifest_dir: &Path) -> usize {
         .map(|m| m.handlers.len())
         .unwrap_or(0)
 }
+pub fn has_owned_handlers(manifest_dir: &Path) -> bool {
+    if reject_links(manifest_dir).is_err() {
+        return false;
+    }
+    fs::read_dir(manifest_dir).ok().is_some_and(|entries| {
+        entries
+            .take(256)
+            .filter_map(std::result::Result::ok)
+            .any(|entry| {
+                let path = entry.path();
+                if path.extension().and_then(|x| x.to_str()) != Some("json")
+                    || reject_links(&path).is_err()
+                {
+                    return false;
+                }
+                entry
+                    .metadata()
+                    .ok()
+                    .filter(|m| m.is_file() && m.len() <= 1024 * 1024)
+                    .and_then(|_| fs::read(path).ok())
+                    .and_then(|b| serde_json::from_slice::<Manifest>(&b).ok())
+                    .is_some_and(|m| !m.handlers.is_empty())
+            })
+    })
+}
 #[cfg(test)]
 mod tests {
     use super::*;

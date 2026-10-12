@@ -1,4 +1,5 @@
 pub mod commands;
+pub mod lifecycle;
 pub mod private;
 pub mod receiver;
 pub mod repository;
