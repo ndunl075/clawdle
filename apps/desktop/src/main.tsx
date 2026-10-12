@@ -8,5 +8,7 @@ void mountClawdle(async()=>createController(createDesktopPlatform({invoke,listen
   isVisible:()=>invoke<boolean>('native_is_visible'),
   doctor:()=>invoke('integration_doctor'),
   install:(scope,project)=>invoke('integration_install',{scope,project}),
-  uninstall:(scope,project)=>invoke('integration_uninstall',{scope,project})
+  uninstall:(scope,project)=>invoke('integration_uninstall',{scope,project}),
+  configure:autoLaunch=>invoke<void>('integration_configure',{autoLaunch}),
+  exportData:text=>invoke<string|null>('native_export',{text})
 });
