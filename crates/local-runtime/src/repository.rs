@@ -48,9 +48,24 @@ pub struct Repository {
 fn db<T>(r: rusqlite::Result<T>) -> Result<T> {
     r.map_err(|_| "storage_error".into())
 }
-fn payload_hash(v:&Value)->String {
-    fn sorted(v:&Value)->Value {match v {Value::Object(map)=>{let mut entries:Vec<_>=map.iter().collect();entries.sort_by(|a,b|a.0.cmp(b.0));Value::Object(entries.into_iter().map(|(k,v)|(k.clone(),sorted(v))).collect())},Value::Array(values)=>Value::Array(values.iter().map(sorted).collect()),_=>v.clone()}}
-    format!("{:x}",Sha256::digest(sorted(v).to_string().as_bytes()))
+fn payload_hash(v: &Value) -> String {
+    fn sorted(v: &Value) -> Value {
+        match v {
+            Value::Object(map) => {
+                let mut entries: Vec<_> = map.iter().collect();
+                entries.sort_by(|a, b| a.0.cmp(b.0));
+                Value::Object(
+                    entries
+                        .into_iter()
+                        .map(|(k, v)| (k.clone(), sorted(v)))
+                        .collect(),
+                )
+            }
+            Value::Array(values) => Value::Array(values.iter().map(sorted).collect()),
+            _ => v.clone(),
+        }
+    }
+    format!("{:x}", Sha256::digest(sorted(v).to_string().as_bytes()))
 }
 fn row(r: &rusqlite::Row<'_>) -> rusqlite::Result<JournalEntry> {
     let json: String = r.get(6)?;
@@ -143,15 +158,7 @@ impl Repository {
         let seq = c.last_insert_rowid();
         db(c.execute(
             "INSERT INTO event_receipts VALUES(?1,?2,?3,?4,?5,?6,?7)",
-            params![
-                id,
-                seq,
-                self.epoch,
-                now,
-                mono,
-                kind,
-                payload_hash(&payload)
-            ],
+            params![id, seq, self.epoch, now, mono, kind, payload_hash(&payload)],
         ))?;
         db(c.commit())?;
         Ok(JournalEntry {
@@ -465,4 +472,3 @@ mod tests {
         assert!(!repo.claim_effect("show:1").unwrap());
     }
 }
-

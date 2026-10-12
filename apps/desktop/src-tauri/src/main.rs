@@ -167,6 +167,14 @@ fn bridge(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     if sibling.is_file() {
         return Ok(sibling);
     }
+    if cfg!(debug_assertions) {
+        if let Some(target) = sibling.parent().and_then(|p| p.parent()) {
+            let release = target.join("release/clawdle-bridge.exe");
+            if release.is_file() {
+                return Ok(release);
+            }
+        }
+    }
     Err("bridge_missing_build_bridge_first".into())
 }
 #[tauri::command]

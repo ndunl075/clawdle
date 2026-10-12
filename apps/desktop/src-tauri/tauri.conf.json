@@ -6,7 +6,10 @@
   "build": {
     "devUrl": "http://127.0.0.1:1420",
     "frontendDist": "../dist",
-    "beforeDevCommand": "pnpm exec vite --config apps/desktop/vite.config.ts"
+    "beforeDevCommand": {
+      "cwd": "../..",
+      "script": "pnpm exec vite --config apps/desktop/vite.config.ts"
+    }
   },
   "app": {
     "windows": [
