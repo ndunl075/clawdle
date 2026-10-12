@@ -1,0 +1,2 @@
+# Deliberate accepted additions, reviewed independently of ESDB.
+ZESTY

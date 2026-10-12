@@ -1,0 +1,10 @@
+# Offensive slurs excluded from accepted guesses. Curated answers are separately reviewed.
+chink
+coons
+faggy
+gooks
+kikes
+nigga
+spics
+spick
+spiks
