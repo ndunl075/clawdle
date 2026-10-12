@@ -2,6 +2,8 @@
 
 A little word break while your coding agent works.
 
+![Clawdle light-theme gameplay](docs/images/clawdle.png)
+
 Clawdle is a free, local five-letter word game for Windows and the browser.
 Solve a daily puzzle, play endless practice, or race a separate puzzle against
 an observed local Claude Code turn. No account, API key, telemetry, hosted

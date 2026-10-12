@@ -27,3 +27,11 @@ date, and outcome for every check. An unchecked item is unverified.
 
 Publish only claims supported by this record. A build artifact alone does not
 establish clean-machine installation or focus behavior.
+
+## Executed on 2026-10-12
+
+Windows 11 Home 10.0.26200. Standard and offline NSIS artifacts built. Offline artifact installed silently into an isolated repository directory with exit 0; dictionary, bridge, MIT license and dependency notices were present. The installed frontend wrote a valid playing Daily checkpoint. This host already had WebView2; the clean-machine gate remains unchecked.
+
+All 28 native tests passed. The actual synthetic packaged hook/protocol benchmark passed with 39 persisted events and 34.43 ms p95 across 30 measured hook processes; see [native-smoke.md](native-smoke.md) for hashes and limits. These automated checks do not replace the unchecked OS interactions above.
+
+Native UI helper failure: `foreground window did not report a process id`, reproduced with a refreshed window handle and normal application launch. Therefore installed GUI/focus/tray/Save As checks are not marked passed.

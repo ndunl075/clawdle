@@ -3,7 +3,7 @@
   "version": 1,
   "lockChecksums": {
     "pnpm-lock.yaml": "dc86a13b512a744f45654381e63dadcecd44686ad837b90f6d2479ea1762ea49",
-    "Cargo.lock": "ef56d6a14831513e80a268cfff987246617a5f258ec1542dd53ec2388f61ca80"
+    "Cargo.lock": "671609678757e7c3e86ab93ba5db8f1c7fe0cc530597240cca07e209b2a293cb"
   },
   "packages": [
     {

@@ -35,3 +35,5 @@ does not count twice.
 **A download shows a Windows trust warning.** Initial releases may be unsigned.
 Check the repository, release version, and checksum. There is no promise that
 unsigned downloads avoid OS warnings.
+
+**An incompatible saved profile will not open.** The startup screen preserves original storage and offers a private recovery export. Confirm explicitly before exporting: a diagnostic copy can contain local session identifiers and damaged saved fields. Keep this copy private. It excludes connection-token and endpoint files; ordinary game exports remain separate and omit raw session identities.
