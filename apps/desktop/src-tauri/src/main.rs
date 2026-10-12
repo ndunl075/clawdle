@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use clawdle_local_runtime::{
-    private, receiver, settings, Checkpoint, JournalEntry, Repository, ResultRecord,
+    lifecycle, private, receiver, settings, Checkpoint, JournalEntry, Repository, ResultRecord,
     RuntimeSnapshot,
 };
 use rand::RngCore;
@@ -13,10 +13,25 @@ use std::{
 use tauri::{Emitter, Manager};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_notification::NotificationExt;
+#[cfg(windows)]
+mod power;
 struct Native {
     repo: Arc<Repository>,
     dir: PathBuf,
     _receiver: Mutex<Option<receiver::Receiver>>,
+    #[cfg(windows)]
+    _power: Mutex<Option<power::PowerMonitor>>,
+}
+fn stop_native(app: &tauri::AppHandle) {
+    let s = app.state::<Native>();
+    let _ = s.repo.append(
+        &uuid::Uuid::new_v4().to_string(),
+        "runtime",
+        json!({"type":"runtime.interrupted"}),
+    );
+    #[cfg(windows)]
+    s._power.lock().unwrap_or_else(|e| e.into_inner()).take();
+    s._receiver.lock().unwrap_or_else(|e| e.into_inner()).take();
 }
 #[tauri::command]
 fn runtime_snapshot(s: tauri::State<Native>) -> Result<RuntimeSnapshot, String> {
@@ -203,6 +218,7 @@ fn integration_install(
         cfg!(debug_assertions),
     )?
     .commit()?;
+    lifecycle::set_background(&s.dir, true).map_err(|_| "background_preference_save")?;
     Ok(json!({"installed":true,"refreshClaudeSession":true}))
 }
 #[tauri::command]
@@ -222,11 +238,16 @@ fn integration_uninstall(
         cfg!(debug_assertions),
     )?
     .commit()?;
+    lifecycle::set_background(
+        &s.dir,
+        settings::has_owned_handlers(&s.dir.join("ownership")),
+    )
+    .map_err(|_| "background_preference_save")?;
     Ok(json!({"installed":false,"refreshClaudeSession":true}))
 }
 #[tauri::command]
 fn integration_configure(s: tauri::State<Native>, auto_launch: bool) -> Result<(), String> {
-    private::atomic_write(&s.dir.join("bridge.json"),&serde_json::to_vec(&json!({"autoLaunch":auto_launch,"desktopPath":std::env::current_exe().map_err(|_|"desktop_path")?})).map_err(|_|"config_json")?).map_err(|_|"config_save".into())
+    lifecycle::update_config(&s.dir,json!({"autoLaunch":auto_launch,"desktopPath":std::env::current_exe().map_err(|_|"desktop_path")?})).map_err(|_|"config_save".into())
 }
 #[tauri::command]
 fn native_always_on_top(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
@@ -303,12 +324,16 @@ fn main() {
                 dir.clone(),
                 repo.clone(),
                 cfg!(debug_assertions),
-                notify,
+                notify.clone(),
             ))?;
+            #[cfg(windows)]
+            let power = power::PowerMonitor::register(repo.clone(), notify)?;
             app.manage(Native {
                 repo: repo.clone(),
                 dir: dir.clone(),
                 _receiver: Mutex::new(Some(receiver)),
+                #[cfg(windows)]
+                _power: Mutex::new(Some(power)),
             });
             geometry(app.handle(), &dir);
             let open =
@@ -324,13 +349,7 @@ fn main() {
                         let _ = show(app, true);
                     }
                     "quit" => {
-                        let s = app.state::<Native>();
-                        let _ = s.repo.append(
-                            &uuid::Uuid::new_v4().to_string(),
-                            "runtime",
-                            json!({"type":"runtime.interrupted"}),
-                        );
-                        s._receiver.lock().unwrap_or_else(|e| e.into_inner()).take();
+                        stop_native(app);
                         app.exit(0);
                     }
                     _ => {}
@@ -369,7 +388,16 @@ fn main() {
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
-                let _ = window.hide();
+                let app = window.app_handle();
+                if app
+                    .try_state::<Native>()
+                    .is_some_and(|s| lifecycle::background_enabled(&s.dir))
+                {
+                    let _ = window.hide();
+                } else {
+                    stop_native(app);
+                    app.exit(0);
+                }
             }
             tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) => {
                 let app = window.app_handle();
