@@ -59,6 +59,34 @@ export function submitGuess(puzzle: Puzzle,input: string,receipt: GuessReceipt):
 }
 export function giveUp(puzzle:Puzzle,utc:string):Puzzle { return puzzle.status==='playing'?{...puzzle,status:'given_up',finishedAtUtc:utc}:puzzle; }
 
+/** Validate recovered saves against the original dictionary and rules before use. */
+export function validateSavedPuzzle(value:unknown):{valid:true;puzzle:Puzzle}|{valid:false;error:string} {
+  const fail=(error:string):{valid:false;error:string}=>({valid:false,error});
+  if(!value||typeof value!=='object'||Array.isArray(value))return fail('invalid_puzzle');
+  const p=value as Record<string,unknown>;
+  const timestamp=(v:unknown)=>typeof v==='string'&&Number.isFinite(Date.parse(v))&&/T.*Z$/.test(v);
+  const duration=(v:unknown)=>v===null||(typeof v==='number'&&Number.isFinite(v)&&v>=0);
+  if(typeof p.gameId!=='string'||!p.gameId||p.gameId.length>256||!['daily','endless','race','speedrun'].includes(String(p.mode))||p.rulesVersion!=='wordle-5x6-v1'||p.dictionaryVersion!==dictionaryVersion||typeof p.wordId!=='string')return fail('unsupported_puzzle');
+  let answer:string;try{answer=wordFromId(p.wordId);}catch{return fail('unknown_word');}
+  if(!timestamp(p.startedAtUtc)||!(p.finishedAtUtc===null||timestamp(p.finishedAtUtc))||!duration(p.elapsedMs)||typeof p.timingValid!=='boolean'||!(p.dailyKey===null||(typeof p.dailyKey==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(p.dailyKey)&&Number.isFinite(Date.parse(p.dailyKey))))||!(p.speedrunId===null||typeof p.speedrunId==='string'))return fail('invalid_metadata');
+  if((p.mode==='daily')!==(p.dailyKey!==null)||(p.mode==='speedrun')!==(p.speedrunId!==null))return fail('invalid_mode_identity');
+  if(!Array.isArray(p.guesses)||p.guesses.length>6)return fail('invalid_guesses');
+  let previousSeq=0;let solved=false;
+  const guesses:Guess[]=[];
+  for(const value of p.guesses){
+    if(!value||typeof value!=='object'||solved)return fail('invalid_guess');
+    const g=value as Record<string,unknown>;
+    if(typeof g.word!=='string'||!validateGuess(g.word).valid||g.word!==g.word.toUpperCase()||!Number.isSafeInteger(g.submittedSeq)||Number(g.submittedSeq)<=previousSeq||!duration(g.elapsedMs)||!Array.isArray(g.tiles))return fail('invalid_guess');
+    const savedTiles=g.tiles;const expected=scoreGuess(answer,g.word);if(savedTiles.length!==5||expected.some((tile,i)=>tile!==savedTiles[i]))return fail('invalid_tiles');
+    previousSeq=Number(g.submittedSeq);solved=expected.every(tile=>tile==='correct');
+    guesses.push({word:g.word,tiles:expected,submittedSeq:previousSeq,elapsedMs:g.elapsedMs as number|null});
+  }
+  const expected=solved?'solved':guesses.length===6?'exhausted':'playing';
+  if(p.status!==expected&&!(p.status==='given_up'&&expected==='playing'))return fail('invalid_outcome');
+  if((p.status==='playing')!==(p.finishedAtUtc===null))return fail('invalid_finish_time');
+  return {valid:true,puzzle:{gameId:p.gameId,mode:p.mode as Mode,rulesVersion:'wordle-5x6-v1',dictionaryVersion,wordId:p.wordId,guesses,status:p.status as PuzzleStatus,startedAtUtc:p.startedAtUtc as string,finishedAtUtc:p.finishedAtUtc as string|null,elapsedMs:p.elapsedMs as number|null,timingValid:p.timingValid,dailyKey:p.dailyKey as string|null,speedrunId:p.speedrunId as string|null}};
+}
+
 export type RaceOutcome='player_win'|'agent_first'|'guesses_exhausted'|'abandoned'|'agent_disconnected'|'interrupted';
 export interface Race {raceId:string;gameId:string;provider:string;sessionId:string;turnId:string;state:'offered'|'running'|'terminal';startedSeq:number;presentedSeq:number|null;startedAtUtc:string;endedAtUtc:string|null;runtimeEpoch:string;elapsedMs:number|null;outcome:RaceOutcome|null;guessCountAtEnd:number;playerSolvedBeforeBoundary:boolean;continuedPuzzleSolved:boolean;ranked:boolean;unrankedReason:string|null;startedMonoMs:number;lastMonoMs:number;lastSeq:number}
 export interface RaceEvent {type:'presented'|'solved'|'exhausted'|'completed'|'session_ended'|'leave'|'interrupt'|'continued_solved'|'activity'|'attention';seq:number;utc:string;monoMs:number;runtimeEpoch:string;provider?:string;sessionId?:string;turnId?:string;scope?:'root'|'child'|'unknown';lateJoin?:boolean;endReason?:string;guessCount?:number}

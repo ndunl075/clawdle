@@ -1,7 +1,7 @@
 import {describe,expect,it} from 'vitest';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
-import {acceptedGuesses,answerIds,createPuzzle,createRace,createSpeedrun,dailyKey,dailyPuzzleNumber,dailySchedule,giveUp,mergeKeyboardStates,reduceRace,reduceSpeedrun,scoreGuess,selectDailyWord,selectEndlessWord,submitGuess,validateGuess,wordFromId,type RaceEvent} from '../src/index';
+import {acceptedGuesses,answerIds,createPuzzle,createRace,createSpeedrun,dailyKey,dailyPuzzleNumber,dailySchedule,giveUp,mergeKeyboardStates,reduceRace,reduceSpeedrun,scoreGuess,selectDailyWord,selectEndlessWord,submitGuess,validateGuess,validateSavedPuzzle,wordFromId,type RaceEvent} from '../src/index';
 
 const utc='2026-10-12T00:00:00Z';
 const puzzle=()=>createPuzzle({gameId:'game',mode:'endless',wordId:'en-v1:apple',startedAtUtc:utc});
@@ -31,6 +31,11 @@ describe('dictionary and immutable puzzle operations',()=>{
   it('solves on every accepted row including the sixth',()=>{for(let winning=1;winning<=6;winning++){let p=puzzle();for(let seq=1;seq<winning;seq++)p=submitGuess(p,'CRANE',{seq,utc}).puzzle;p=submitGuess(p,'APPLE',{seq:winning,utc,elapsedMs:300}).puzzle;expect(p.status).toBe('solved');expect(p.guesses).toHaveLength(winning);expect(p.elapsedMs).toBe(300);expect(submitGuess(p,'APPLE',{seq:9,utc}).puzzle).toBe(p);}});
   it('exhausts six wrong rows and ignores retries',()=>{let p=puzzle();for(let seq=1;seq<=6;seq++){p=submitGuess(p,'CRANE',{seq,utc}).puzzle;expect(submitGuess(p,'CRANE',{seq,utc}).puzzle).toBe(p);}expect(p.status).toBe('exhausted');expect(puzzle().guesses).toHaveLength(0);});
   it('give up terminates once',()=>{const p=giveUp(puzzle(),utc);expect(p.status).toBe('given_up');expect(giveUp(p,'later')).toBe(p);});
+  it('recovers original version saves and strips unknown fields',()=>{const p=submitGuess(puzzle(),'APPLE',{seq:1,utc}).puzzle;const recovered=validateSavedPuzzle({...p,secret:'discard'});expect(recovered).toEqual({valid:true,puzzle:p});expect(validateSavedPuzzle(puzzle()).valid).toBe(true);});
+  it('quarantines malformed, unsupported or inconsistent saves',()=>{
+    const p=submitGuess(puzzle(),'CRANE',{seq:1,utc}).puzzle;
+    for(const corrupted of [null,[],{...p,rulesVersion:'old'},{...p,dictionaryVersion:'en-v9'},{...p,wordId:'en-v1:zzzzz'},{...p,guesses:[{...p.guesses[0],tiles:Array(5).fill('correct')}]},{...p,guesses:[p.guesses[0],p.guesses[0]]},{...p,status:'solved'},{...p,elapsedMs:-1},{...p,startedAtUtc:'invalid'},{...p,mode:'daily',dailyKey:null},{...p,finishedAtUtc:utc}])expect(validateSavedPuzzle(corrupted).valid).toBe(false);
+  });
   it('matches all manifest checksums',()=>{
     const root=new URL('../../../',import.meta.url);const manifest=JSON.parse(readFileSync(new URL('assets/words/manifest.json',root),'utf8')) as {checksums:Record<string,string>;sourceChecksum:string;sourceArchive:string;entryCounts:{answers:number;guesses:number;daily:number}};
     for(const [path,checksum]of Object.entries(manifest.checksums))expect(createHash('sha256').update(readFileSync(new URL(path,root))).digest('hex'),path).toBe(checksum);
