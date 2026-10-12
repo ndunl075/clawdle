@@ -1,0 +1,32 @@
+{
+  "sourceUrl": "https://github.com/en-wl/wordlist",
+  "sourceRevision": "1e5b7d3a72f47a71da5d28686c1dd4b397178485",
+  "sourceArchive": "esdb-1e5b7d3.zip",
+  "sourceChecksum": "83d7608fd337d67104ab4b9dc140ff2f3f07fd57f58d6692a35909b5970904eb",
+  "generationOptions": {
+    "size": 70,
+    "spelling": "A",
+    "variantLevel": 1,
+    "excludePos": [
+      "abbr"
+    ],
+    "deaccent": true,
+    "filter": "^[a-z]{5}$; uppercase; project inclusions/exclusions; independently curated answers"
+  },
+  "noticeChecksum": "1ffb6bbed9787f23fa6e9e1127ad153a35e5aa2aca294c2cf69347c87256f19f",
+  "dictionaryVersion": "en-v1",
+  "scheduleVersion": "daily-v1",
+  "referenceDate": "2026-10-12T00:00:00Z",
+  "checksums": {
+    "assets/words/answers-v1.json": "e626b5f2858c35d4edd9e312b96b3f7511cbbc06628d8af8b60ca99b912e88f9",
+    "assets/words/guesses-v1.txt": "2f626125445e503d94d0ede02540faef236b2728546f82a8279a515f225550c9",
+    "assets/words/daily-v1.json": "abe65c6cc9848ea2e5575dfbaa9e8034678d85e2418f46c6a6f42d324d4d2254",
+    "packages/game/src/words.generated.json": "7697d407d9862630168a9b881a01cc85fd92b4882d978b92fc475e79563d4b95",
+    "assets/licenses/ESDB-Copyright.txt": "1ffb6bbed9787f23fa6e9e1127ad153a35e5aa2aca294c2cf69347c87256f19f"
+  },
+  "entryCounts": {
+    "answers": 912,
+    "guesses": 7047,
+    "daily": 912
+  }
+}
