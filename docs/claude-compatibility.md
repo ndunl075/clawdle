@@ -19,6 +19,25 @@ Use another fresh fixture with `--scenario provider-error` for StopFailure. The 
 
 The journal must contain real CLI SessionStart, UserPromptSubmit and the expected Stop/StopFailure, with exactly one correlated start and terminal event. A synthetic private-prompt canary must be absent. Silent hook exit alone is not accepted as proof of delivery.
 
+## Additional scenarios (not yet executed)
+
+Three more `--scenario` values exist so the remaining lifecycle claims can be executed later. **No evidence has been recorded for them**; the executed table below is unchanged, and a scenario stays unverified until a real run passes and is appended there. Use a fresh `--fixture` directory for each and the same `--claude`, `--bridge` and `--data-dir` arguments as above (shown with `$a` for brevity):
+
+```powershell
+$a = '--claude','C:\absolute\path\claude.exe','--bridge','C:\absolute\path\clawdle-bridge.exe','--data-dir','C:\absolute\checkout\.local\native-smoke-cli-app'
+python scripts/claude-lifecycle-smoke.py @a --fixture 'C:\absolute\checkout\.local\native-smoke-cli-permission' --scenario permission
+python scripts/claude-lifecycle-smoke.py @a --fixture 'C:\absolute\checkout\.local\native-smoke-cli-subagent' --scenario subagent
+python scripts/claude-lifecycle-smoke.py @a --fixture 'C:\absolute\checkout\.local\native-smoke-cli-session-end' --scenario session-end
+```
+
+- `permission`: runs with `--permission-mode default` and only the `Write` tool (never a bypass or skip-permissions mode). The synthetic provider answers the first request with a `Write` tool use aimed at a file inside the fixture project. Nothing approves it. Accepted only if the journal holds a root `agent.needs_attention` event with `attentionKind: permission` (from `PermissionRequest` or a `permission_prompt` `Notification`) between the start and the terminal, exactly one correlated `Stop`, and the target file was never created. Claude may not raise `PermissionRequest` in headless `--print` mode; if it does not, the run fails with `permission_attention_not_journaled` and that result is the finding (the case then needs an interactive run).
+- `subagent`: exposes only the `Agent` (or legacy `Task`) tool; the provider answers the first request with a tool use that starts one child, the child's own request gets plain text. Accepted only if every `SubagentStop` is journaled with `scope: child`, none is root, no child event carries start or session-end semantics, the child finishes before the root terminal, and the root keeps exactly one start and one terminal.
+- `session-end`: a normal success turn; additionally requires exactly one root `SessionEnd` (`agent.session_ended`) after the terminal. The wait extends until it appears (5 s). If headless `--print` does not fire `SessionEnd` before exit, the run fails with `expected_single_session_end`; interactive shutdown would then need a separate run.
+
+Failed runs keep a sanitized `observedEvents` list (sequence, source event, scope, type) in `result.json` to show what actually fired.
+
+Pure acceptance and provider logic is covered by `python -m unittest discover -s scripts/tests` (also run in CI) without launching Claude.
+
 This verifies actual CLI hook dispatch and normalization against a local synthetic provider. It does not prove hosted-model behavior, interactive SessionEnd, permission attention, subagent lifecycle, native focus, sleep/resume, or other Claude versions. Those checks remain separate acceptance items. The [official hook reference](https://code.claude.com/docs/en/hooks) documents exec-form arguments, asynchronous hooks and prompt identity; execution evidence takes precedence over assumptions from the schema.
 
 ## Executed evidence
