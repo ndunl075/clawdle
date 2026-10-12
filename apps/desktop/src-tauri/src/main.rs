@@ -13,6 +13,7 @@ use std::{
 use tauri::{Emitter, Manager};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_notification::NotificationExt;
+mod export;
 #[cfg(windows)]
 mod power;
 struct Native {
@@ -156,6 +157,24 @@ fn native_clipboard(app: tauri::AppHandle, text: String) -> Result<(), String> {
         .map_err(|_| "clipboard_unavailable".into())
 }
 #[tauri::command]
+async fn native_export(app: tauri::AppHandle, text: String) -> Result<Option<String>, String> {
+    #[cfg(windows)]
+    let owner = app
+        .get_webview_window("main")
+        .ok_or("window_missing")?
+        .hwnd()
+        .map_err(|_| "window_handle")?
+        .0 as usize;
+    #[cfg(not(windows))]
+    let owner = {
+        let _ = app;
+        0usize
+    };
+    tauri::async_runtime::spawn_blocking(move || export::save(owner, text))
+        .await
+        .map_err(|_| "export_worker_failed".to_owned())?
+}
+#[tauri::command]
 fn native_notify(app: tauri::AppHandle, title: String, body: String) -> Result<(), String> {
     if title.len() > 80 || body.len() > 256 {
         return Err("notification_limit".into());
@@ -199,7 +218,8 @@ fn integration_doctor(app: tauri::AppHandle, s: tauri::State<Native>) -> Value {
         .as_ref()
         .map(|p| settings::owned_count(p, &s.dir.join("ownership")))
         .unwrap_or(0);
-    json!({"protocolVersion":1,"tokenPresent":s.dir.join("token").is_file(),"receiverAvailable":private::endpoint(&s.dir).is_ok(),"ownedUserHandlers":count,"installed":count>0,"claudeVersion":null,"bridgePresent":bridge(&app).is_ok(),"compatibility":"Windows native Claude Code; documented prompt_id and exec-form command hooks required. Refresh the Claude session after setup. Native Claude smoke testing is still required for a version support claim."})
+    let config = lifecycle::read_config(&s.dir).unwrap_or_else(|_| json!({}));
+    json!({"protocolVersion":1,"tokenPresent":s.dir.join("token").is_file(),"receiverAvailable":private::endpoint(&s.dir).is_ok(),"ownedUserHandlers":count,"installed":settings::has_owned_handlers(&s.dir.join("ownership")),"autoLaunch":config["autoLaunch"]==true,"backgroundIntegration":config["backgroundIntegration"]==true,"claudeVersion":null,"bridgePresent":bridge(&app).is_ok(),"compatibility":"Windows native Claude Code; documented prompt_id and exec-form command hooks required. Refresh the Claude session after setup. Native Claude smoke testing is still required for a version support claim."})
 }
 #[tauri::command]
 fn integration_install(
@@ -303,6 +323,7 @@ fn main() {
             native_is_visible,
             native_hide,
             native_clipboard,
+            native_export,
             native_notify,
             native_always_on_top,
             integration_doctor,

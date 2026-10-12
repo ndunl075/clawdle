@@ -591,6 +591,7 @@ dependencies = [
  "tauri-plugin-clipboard-manager",
  "tauri-plugin-notification",
  "tauri-plugin-single-instance",
+ "tempfile",
  "tokio",
  "uuid",
  "windows-sys 0.61.2",
