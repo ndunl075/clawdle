@@ -77,6 +77,8 @@ class ProviderTests(unittest.TestCase):
         for name in smoke.SUBAGENT_TOOLS:
             block = stream(smoke.provider_response('subagent', request([name]), '/p')[2])[1]['content_block']
             self.assertEqual(block['name'], name)
+        tool = smoke.planned_tool_use('subagent', request(['Agent']), '/p')
+        self.assertIs(tool[1]['run_in_background'], False)
         child = request(['Agent'], text=smoke.CHILD_MARKER)
         self.assertIn(smoke.TEXT, smoke.provider_response('subagent', child, '/p')[2].decode())
         done = request(['Agent'], tool_result=True)
@@ -152,7 +154,7 @@ class AcceptanceTests(unittest.TestCase):
     def test_subagent_failures(self):
         fails(self, 'subagent', base(), 'subagent_stop_not_journaled')
         late = base() + [(11, ev('SubagentStop', 'child', 'agent.turn_completed'))]
-        fails(self, 'subagent', late, 'child_stop_after_root_terminal')
+        self.assertTrue(check('subagent', late)['rootPairUnaffectedByChild'])
         started = self.subagent() + [(6, ev('UserPromptSubmit', 'child', 'agent.started'))]
         fails(self, 'subagent', started, 'child_event_has_root_semantics')
         fails(self, 'subagent', self.subagent() + [(5, ev('SubagentStop', 'root', 'agent.turn_completed'))], 'subagent_stop_scoped_root')
