@@ -295,7 +295,7 @@ interface AgentEvent {
   observedAtUtc: string;           // Diagnostic; not the race ordering clock
   projectKey: string | null;       // Hash with an installation-specific salt
   attentionKind?: 'permission' | 'input';
-  activityKind?: 'session_ready' | 'tool_started' | 'tool_finished';
+  activityKind?: 'session_ready' | 'tool_started' | 'tool_finished' | 'system_turn';
   endReason?: 'closed' | 'interrupted' | 'provider_error' | 'unknown';
 }
 ```
@@ -321,7 +321,7 @@ Hook behavior was checked against the official Claude Code documentation on Octo
 | Claude hook | Clawdle interpretation |
 | --- | --- |
 | `SessionStart` | Readiness activity; never starts a race |
-| `UserPromptSubmit` | Root turn start, bound to available `prompt_id` |
+| `UserPromptSubmit` | Root turn start, bound to available `prompt_id`; a system-initiated result turn is `agent.activity` / `system_turn` and never starts a race |
 | `PreToolUse` / `PostToolUse` | Optional working activity; no tool arguments retained |
 | `PermissionRequest` | Permission attention, without a decision |
 | `Notification` with permission/input subtype | Attention indicator |
@@ -336,7 +336,17 @@ Command hooks receive stdin JSON. Allowlist `session_id`, `prompt_id`, event nam
 
 Install asynchronous command hooks for activity events and synchronous, 1 s-timeout hooks for `Stop` and `StopFailure`. The bridge writes no stdout/stderr context, emits no permission or Stop decision, and returns exit code 0 on malformed input or delivery failure. It enforces its own short deadline because async-hook timeout behavior must not be relied upon.
 
-Prompt-start hooks can also represent agent-initiated turns. Without supported origin metadata, Clawdle treats them as observed top-level turns and does not claim to distinguish human submissions by inspecting prompt text.
+#### System-initiated turns
+
+When the Agent tool runs a subagent with `run_in_background: true`, the root turn ends first; Claude later starts a new root turn, which fires `UserPromptSubmit` then `Stop`, to deliver the result. The user did not type that prompt, so it must not start a race.
+
+Evidence (Claude Code 2.1.282, real CLI against a loopback synthetic provider, raw hook stdin captured locally): the injected `UserPromptSubmit` has exactly the same field set as a typed one (`session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`, `prompt`) and a fresh `prompt_id`. The official hook reference documents no origin, source, or synthetic marker for that event. The only difference is that the prompt text begins with the tag `<task-notification>`. A structural proxy, a preceding `Stop` with non-empty `background_tasks`, is documented but cannot tell a user prompt typed while the task runs from the result delivery.
+
+Rule: the adapter checks whether the in-memory prompt begins with `<task-notification>`. It reads at most the marker's length (19 bytes), copies nothing, and emits only the enum `activityKind: 'system_turn'`. A matching root `UserPromptSubmit` is normalized to `agent.activity` instead of `agent.started`, keeping its `turnId` and `sourceEvent`. The race controller therefore never creates a race for it, and the bridge's cold-start path (which launches the app only for a root `agent.started`) does not fire. The result turn's `Stop` is an ordinary completion for an unbound `turnId`, so it only leaves a tombstone.
+
+Privacy: this is the one place the adapter looks at prompt content, and it stays inside the rule that prompt text is discarded. The prompt is already parsed in memory with the rest of stdin; the check is a fixed-length prefix comparison whose result is a closed enum. No prompt text, prefix, tag content, or length is stored, journaled, logged, transmitted, or placed in the schema. The tag's inner content (task id, result text) is never read.
+
+Limitations: the marker is observed behavior, not a documented contract, and was verified only on 2.1.282 for background subagents. Other system-injected prompts (scheduled or monitor wakeups, for example) were not observed and still count as observed top-level turns. A user who types a prompt starting with `<task-notification>` skips a race, which is harmless. If Claude changes the tag the failure mode is the earlier behavior: an extra race, never a lost one. Re-check on each supported Claude version.
 
 ### Installation and removal
 

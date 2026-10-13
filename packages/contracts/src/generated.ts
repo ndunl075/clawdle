@@ -11,7 +11,7 @@ export type AgentEvent = {
   "observedAtUtc": string;
   "projectKey": string | null;
   "attentionKind"?: "permission" | "input";
-  "activityKind"?: "session_ready" | "tool_started" | "tool_finished";
+  "activityKind"?: "session_ready" | "tool_started" | "tool_finished" | "system_turn";
   "endReason"?: "closed" | "interrupted" | "provider_error" | "unknown";
 };
 export type JournalEntry = {
