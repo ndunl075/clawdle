@@ -7,11 +7,18 @@ use std::{
     time::{Duration, Instant},
 };
 
-/// Total hook budget (hard limit 300 ms). The receiver acks only after a durable fsync, whose tail
-/// latency on a loaded disk can pass 100 ms, so a single attempt may use half of the budget and the
-/// retry (same eventId, deduplicated) gets the rest.
-const HOOK_DEADLINE_MS: u64 = 280;
-const HOOK_ATTEMPT_MS: u64 = 140;
+/// Hook budget measured from the start of main. The hard limit is 300 ms of process wall-clock, and
+/// process start and teardown take about 25-30 ms (more under load), so the in-process deadline
+/// leaves that headroom.
+/// The receiver acks only after a durable fsync, whose tail latency on a loaded disk can pass
+/// 100 ms, so an attempt may use about half of the budget and the retry (same eventId,
+/// deduplicated) gets the rest.
+const HOOK_DEADLINE_MS: u64 = 200;
+const HOOK_ATTEMPT_MS: u64 = 100;
+/// A loopback connect to a listening receiver completes in the kernel without waiting for the app,
+/// while a refused loopback connect on Windows is retried for about a second before failing. A short
+/// connect cap makes "receiver not running" fail fast instead of consuming the whole budget.
+const CONNECT_MS: u64 = 40;
 
 fn deliver(
     dir: &Path,
@@ -30,7 +37,7 @@ fn deliver(
         }
         if let Ok(mut socket) = TcpStream::connect_timeout(
             &SocketAddrV4::new(Ipv4Addr::LOCALHOST, endpoint.port).into(),
-            budget,
+            budget.min(Duration::from_millis(CONNECT_MS)),
         ) {
             let _ = socket.set_read_timeout(Some(budget));
             let _ = socket.set_write_timeout(Some(budget));
@@ -159,5 +166,59 @@ fn main() {
     if let Err(code) = run(&args) {
         eprintln!("{code}");
         std::process::exit(1);
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn fixture(port: u16) -> tempfile::TempDir {
+        let d = tempfile::tempdir().unwrap();
+        private::secure_dir(d.path()).unwrap();
+        let endpoint = private::Endpoint {
+            protocol_version: 1,
+            port,
+            runtime_epoch: "test".into(),
+            pid: std::process::id(),
+            development: true,
+        };
+        private::atomic_write(
+            &d.path().join("endpoint.json"),
+            &serde_json::to_vec(&endpoint).unwrap(),
+        )
+        .unwrap();
+        private::token(d.path()).unwrap();
+        d
+    }
+    fn event() -> clawdle_agent_adapters::AgentEvent {
+        clawdle_agent_adapters::parse_claude(
+            br#"{"hook_event_name":"Stop","session_id":"s","prompt_id":"p"}"#,
+            b"salt",
+        )
+        .unwrap()
+        .unwrap()
+    }
+    #[test]
+    fn receiver_down_fails_fast() {
+        // Bind and drop to get a loopback port with nothing listening.
+        let port = std::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
+            .unwrap()
+            .local_addr()
+            .unwrap()
+            .port();
+        let d = fixture(port);
+        let started = Instant::now();
+        let deadline = started + Duration::from_millis(HOOK_DEADLINE_MS);
+        assert!(deliver(d.path(), &event(), deadline).is_err());
+        assert!(
+            started.elapsed() < Duration::from_millis(2 * CONNECT_MS + 40),
+            "{:?}",
+            started.elapsed()
+        );
+    }
+    #[test]
+    fn budget_leaves_process_headroom() {
+        assert!(HOOK_DEADLINE_MS + 80 <= 300);
+        assert!(2 * HOOK_ATTEMPT_MS <= HOOK_DEADLINE_MS);
+        assert!(CONNECT_MS < HOOK_ATTEMPT_MS);
     }
 }
