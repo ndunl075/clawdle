@@ -3,27 +3,27 @@
 Record OS version, app version, artifact checksum, Claude Code version, test
 date, and outcome for every check. An unchecked item is unverified.
 
-- [ ] Standard per-user x64 install, launch, uninstall.
-- [ ] Clean supported Windows PC offline install with no WebView2 present.
-- [ ] Disconnected Daily and Endless, dictionary lookup and close/reopen resume.
-- [ ] Real asynchronous silent hooks; malformed input and receiver-down exit budget.
-- [ ] Existing unrelated hooks/settings survive install, repeat install, remove.
-- [ ] Spaces and Unicode in installation/project paths.
+- [x] Standard per-user x64 install, launch, uninstall. *(acceptance/install.md)*
+- [ ] Clean supported Windows PC offline install with no WebView2 present. *(Known limitation for v0.1.0: no clean machine available.)*
+- [x] Disconnected Daily and Endless, dictionary lookup and close/reopen resume. *(acceptance/gameplay.md; resume fixed by #35)*
+- [x] Real asynchronous silent hooks; malformed input and receiver-down exit budget. *(acceptance/install.md; fixed by #34. Tails can exceed 300 ms only under heavy CPU load.)*
+- [x] Existing unrelated hooks/settings survive install, repeat install, remove. *(acceptance/install.md)*
+- [x] Spaces and Unicode in installation/project paths. *(acceptance/install.md)*
 - [ ] Typing in an IDE continues without focus loss during automatic presentation. *(Foreground probe with Notepad passed 2026-10-12; no IDE, no live typing.)*
-- [ ] Hook second launch never activates or steals focus.
+- [x] Hook second launch never activates or steals focus. *(acceptance/gameplay.md)*
 - [ ] Tray close/reopen preserves puzzle; explicit Quit stops listener. *(Close/reopen passed 2026-10-12; explicit Quit not yet run.)*
-- [ ] Geometry clamps to monitor work area after monitor removal.
-- [ ] Player-first, agent-first, hidden Stop, short turn, two sessions, child Stop.
+- [ ] Geometry clamps to monitor work area after monitor removal. *(Known limitation for v0.1.0: no external monitor available.)*
+- [x] Player-first, agent-first, hidden Stop, short turn, two sessions, child Stop. *(acceptance/gameplay.md, real Claude 2.1.282)*
 - [ ] Provider error, session end, sleep/resume, crash recovery, missed notification.
 - [x] Permission attention never approves or operates Claude. *(Claude Code 2.1.282, 2026-10-12; see claude-compatibility.md.)*
-- [ ] Wrong token/Origin/Host/oversized/slow body rejected on IPv4 loopback only.
-- [ ] Private endpoint/token/mailbox/settings-backup ACL and reparse-point checks.
-- [ ] Save failure never acknowledges a durable move or awards ranked progression.
-- [ ] Exports/diagnostics contain no secrets, prompt, transcript, response, or code.
-- [ ] No outbound application traffic during ordinary disconnected gameplay.
-- [ ] Keyboard navigation, narrow viewport, reduced motion, high contrast.
-- [ ] Native plus WebView2 working set, idle CPU, warm/cold launch measured.
-- [ ] Bridge running-receiver delivery p95 and hard 300 ms failure budget measured.
+- [x] Wrong token/Origin/Host/oversized/slow body rejected on IPv4 loopback only. *(acceptance/security.md; slow headers cut off by #34)*
+- [x] Private endpoint/token/mailbox/settings-backup ACL and reparse-point checks. *(acceptance/security.md)*
+- [x] Save failure never acknowledges a durable move or awards ranked progression. *(acceptance/security.md; SQLite write-lock fault only)*
+- [x] Exports/diagnostics contain no secrets, prompt, transcript, response, or code. *(acceptance/security.md)*
+- [x] No outbound application traffic during ordinary disconnected gameplay. *(acceptance/security.md; WebView2 browser-internal connections recorded separately)*
+- [x] Keyboard navigation, narrow viewport, reduced motion, high contrast. *(acceptance/gameplay.md; Enter/focus fixed by #36. Tile colour contrast below 3:1 is a known limitation; High contrast mode exists.)*
+- [x] Native plus WebView2 working set, idle CPU, warm/cold launch measured. *(native-performance.md: about 185 MiB private, within the 200 MB target; cold launch 3-7 s misses the 2 s aim.)*
+- [x] Bridge running-receiver delivery p95 and hard 300 ms failure budget measured. *(acceptance/install.md)*
 
 Publish only claims supported by this record. A build artifact alone does not
 establish clean-machine installation or focus behavior.
