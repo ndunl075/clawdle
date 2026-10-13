@@ -48,7 +48,7 @@ Check 'hidden target is 200 MiB' ((Get-PrivateBytesTarget -Presentation 'hidden'
 Check 'visible target is 200 MiB' ((Get-PrivateBytesTarget -Presentation 'visible') -eq 200MB)
 Check 'hidden at target passes' ((Test-PrivateBytesTarget -PeakPrivateBytes 200MB -Presentation 'hidden') -eq $true)
 Check 'hidden over target fails' ((Test-PrivateBytesTarget -PeakPrivateBytes (200MB + 1) -Presentation 'hidden') -eq $false)
-Check '150 MiB passes visible but fails hidden' ((Test-PrivateBytesTarget -PeakPrivateBytes 150MB -Presentation 'visible') -eq $true -and (Test-PrivateBytesTarget -PeakPrivateBytes 150MB -Presentation 'hidden') -eq $false)
+Check '190 MiB passes in both states' ((Test-PrivateBytesTarget -PeakPrivateBytes 190MB -Presentation 'visible') -eq $true -and (Test-PrivateBytesTarget -PeakPrivateBytes 190MB -Presentation 'hidden') -eq $true)
 Check 'missing peak gives no verdict' ($null -eq (Test-PrivateBytesTarget -PeakPrivateBytes $null -Presentation 'visible'))
 $okRun = [pscustomobject]@{privateBytesTargetPass = $true}
 $badRun = [pscustomobject]@{privateBytesTargetPass = $false}
