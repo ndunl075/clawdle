@@ -148,7 +148,7 @@ impl Repository {
             if old.kind != kind || old.payload != payload { return Err("idempotency_conflict".into()); } return Ok(old);
         }
         // The mutex is the single writer. Receipt clocks are assigned inside it.
-        let now = chrono::Utc::now().to_rfc3339();
+        let now = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true);
         let mono = self.mono();
         let count: i64 = db(c.query_row("SELECT COUNT(*) FROM event_journal", [], |r| r.get(0)))?;
         if count >= 100_000 {
@@ -202,7 +202,8 @@ impl Repository {
         Ok(RuntimeSnapshot {
             runtime_epoch: self.epoch.clone(),
             received_mono_ms: self.mono(),
-            received_at_utc: chrono::Utc::now().to_rfc3339(),
+            received_at_utc: chrono::Utc::now()
+                .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
             latest_seq: seq,
             checkpoint: cp,
         })
@@ -346,7 +347,10 @@ impl Repository {
         let c = self.conn.lock().map_err(|_| "storage_lock")?;
         Ok(db(c.execute(
             "INSERT OR IGNORE INTO effect_receipts VALUES(?1,?2)",
-            params![id, chrono::Utc::now().to_rfc3339()],
+            params![
+                id,
+                chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true)
+            ],
         ))? == 1)
     }
 }
@@ -400,6 +404,21 @@ mod tests {
             )
             .unwrap();
         assert_eq!(fourth.seq, third.seq + 1);
+    }
+    #[test]
+    fn receipt_timestamps_are_utc_millis_with_z() {
+        let repo = Repository::open(Path::new(":memory:")).unwrap();
+        let entry = repo
+            .append(
+                &uuid::Uuid::new_v4().to_string(),
+                "command",
+                serde_json::json!({"type":"startDaily"}),
+            )
+            .unwrap();
+        // The frontend validator and toISOString() use this shape; +00:00 once quarantined saves.
+        let t = &entry.received_at_utc;
+        assert!(t.ends_with('Z') && t.len() == 24, "{t}");
+        assert!(chrono::DateTime::parse_from_rfc3339(t).is_ok());
     }
     #[test]
     fn ordering_idempotency_and_atomic_conflicts() {
