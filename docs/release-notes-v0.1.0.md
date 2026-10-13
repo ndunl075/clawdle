@@ -19,7 +19,8 @@ These checks ran on Windows 11 Home 10.0.26200 against packaged builds with real
 - The local receiver accepts only authenticated IPv4 loopback requests. It rejects a wrong token, Origin or Host, oversized bodies and slow clients.
 - Private files carry owner-only ACLs and reparse points are refused.
 - Exports and diagnostics contain no secrets, prompts or transcripts. The app makes no outbound traffic during ordinary play.
-- Keyboard navigation, a 320 px narrow layout, reduced motion and high contrast.
+- Sleep and wake keep your puzzle. Export Save As and Cancel both behave normally. Tray Quit stops the app and its local listener.
+- Keyboard navigation, a 320 px narrow layout, reduced motion and high contrast. Guesses get a Wordle-style flip reveal, which Reduced motion turns off.
 - Memory: about 185 MiB private bytes, visible or hidden, within the 200 MB target. Hook delivery p95 is about 40-50 ms on a quiet machine.
 
 ## Known limitations

@@ -9,12 +9,12 @@ date, and outcome for every check. An unchecked item is unverified.
 - [x] Real asynchronous silent hooks; malformed input and receiver-down exit budget. *(acceptance/install.md; fixed by #34. Tails can exceed 300 ms only under heavy CPU load.)*
 - [x] Existing unrelated hooks/settings survive install, repeat install, remove. *(acceptance/install.md)*
 - [x] Spaces and Unicode in installation/project paths. *(acceptance/install.md)*
-- [ ] Typing in an IDE continues without focus loss during automatic presentation. *(Foreground probe with Notepad passed 2026-10-12; no IDE, no live typing.)*
+- [x] Typing in an IDE continues without focus loss during automatic presentation. *(2026-10-13: maintainer typing while a real Claude turn auto-showed the window; the foreground app kept focus for all 924 samples. Earlier Notepad probe also passed.)*
 - [x] Hook second launch never activates or steals focus. *(acceptance/gameplay.md)*
-- [ ] Tray close/reopen preserves puzzle; explicit Quit stops listener. *(Close/reopen passed 2026-10-12; explicit Quit not yet run.)*
+- [x] Tray close/reopen preserves puzzle; explicit Quit stops listener. *(Close/reopen: acceptance/gameplay.md and #37. Quit: maintainer, 2026-10-13; process exited and endpoint.json was removed.)*
 - [ ] Geometry clamps to monitor work area after monitor removal. *(Known limitation for v0.1.0: no external monitor available.)*
 - [x] Player-first, agent-first, hidden Stop, short turn, two sessions, child Stop. *(acceptance/gameplay.md, real Claude 2.1.282)*
-- [ ] Provider error, session end, sleep/resume, crash recovery, missed notification.
+- [x] Provider error, session end, sleep/resume, crash recovery, missed notification. *(acceptance/gameplay.md; sleep/resume kept the puzzle, maintainer 2026-10-13. Session end is unverified: headless Claude 2.1.282 does not emit it, and it does not affect races.)*
 - [x] Permission attention never approves or operates Claude. *(Claude Code 2.1.282, 2026-10-12; see claude-compatibility.md.)*
 - [x] Wrong token/Origin/Host/oversized/slow body rejected on IPv4 loopback only. *(acceptance/security.md; slow headers cut off by #34)*
 - [x] Private endpoint/token/mailbox/settings-backup ACL and reparse-point checks. *(acceptance/security.md)*
@@ -63,3 +63,16 @@ Memory, same build, summed private bytes across 3 × 60 s launches (target: at m
 | --- | --- | --- | --- | --- |
 | Visible | 184.8–188.2 MiB, **passes** | 179.2–183.5 MiB | 407–412 MiB | 3.3–6.8 s (cold-launch aim of 2 s not met; the readiness proxy includes harness inspection overhead) |
 | Hidden (main `9585164` plus #27) | 182.9–187.6 MiB, **passes** | 180.8–184.2 MiB | 381–389 MiB | n/a |
+
+## Maintainer manual checks, 2026-10-13
+
+Windows 11 Home 10.0.26200, build of main `9ba2584`, isolated test profile.
+
+| Check | Result |
+| --- | --- |
+| Sleep and wake with a Daily guess entered | Passed; the guess was still there |
+| Export: Save As to a file, then a second export cancelled | Passed |
+| Real Claude turn auto-shows the window while the maintainer types elsewhere | Passed; the window appeared, and focus stayed on the maintainer's app |
+| Tray → Quit | Passed; the process exited and `endpoint.json` was removed |
+
+The same session found and fixed: Enter reopening Settings after a dialog closed, a cramped Settings footer, the window opening partly behind the taskbar, and no Wordle-style reveal animation (#39).
