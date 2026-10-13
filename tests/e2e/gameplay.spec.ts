@@ -75,6 +75,21 @@ test('agent-first race keeps remaining guesses and never reverses its outcome',a
   expect(await page.evaluate(()=>window.clawdleFixture.results())).toBe(1);
 });
 
+test('a turn that ends before presentation is explained as too short to race',async({page})=>{
+  await page.goto('/?fixture=race&short=1');
+  await expect(page.getByRole('status')).toHaveText('That turn was too short to race.');
+  expect(await page.evaluate(()=>window.clawdleFixture.outcome())).toBe('agent_first');
+});
+test('Enter activates focused buttons and focus returns to the opener after a dialog closes',async({page})=>{
+  await page.goto('/');
+  const settings=page.getByRole('button',{name:'Settings',exact:true});
+  await settings.focus();await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('A');await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(settings).toBeFocused();
+  await expect(page.locator('.grid .tile').first()).toHaveText('');
+});
 test('UTC rollover offers a new daily without replacing the unfinished board',async({page})=>{
   await page.clock.install({time:new Date('2026-10-12T23:59:55Z')});
   await page.goto('/');await typeWord(page,'APPLE');

@@ -2,7 +2,7 @@
 import { createController, emptyState, type Platform, type JournalEntry, type Checkpoint, type AppController } from '@clawdle/app-core';
 import { wordFromId } from '@clawdle/game';
 declare global {interface Window {clawdleFixture:{answer:()=>string;stop:(scope?:'root'|'child')=>Promise<void>;outcome:()=>string|null;results:()=>number}}}
-export async function createRaceFixture():Promise<AppController> {
+export async function createRaceFixture({short=false}:{short?:boolean}={}):Promise<AppController> {
   const runtimeEpoch=crypto.randomUUID();
   const state=emptyState();state.settings.autoRace=true;
   let checkpoint:Checkpoint={stateVersion:0,processedSeq:0,state};
@@ -19,6 +19,8 @@ export async function createRaceFixture():Promise<AppController> {
     subscribe:async listener=>{listeners.add(listener);return()=>listeners.delete(listener);},id:()=>crypto.randomUUID(),randomUnit:()=>0.25
   };
   append('agent',crypto.randomUUID(),{provider:'claude',sessionId:'synthetic-session',turnId:'synthetic-turn',scope:'root',type:'agent.started'});
+  // A short turn: Claude stops before the race can be presented.
+  if(short)append('agent',crypto.randomUUID(),{provider:'claude',sessionId:'synthetic-session',turnId:'synthetic-turn',scope:'root',type:'agent.turn_completed'});
   const controller=await createController(platform);
   window.clawdleFixture={
     answer:()=>wordFromId(controller.state.games[controller.state.activeGameId!]!.wordId),
