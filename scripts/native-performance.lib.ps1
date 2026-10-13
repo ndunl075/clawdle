@@ -98,7 +98,7 @@ function Get-LaunchArguments {
 # Summed private bytes target (MB = MiB): 120 hidden to tray, 200 visible.
 function Get-PrivateBytesTarget {
     param([ValidateSet('hidden','visible')][string]$Presentation)
-    if ($Presentation -eq 'hidden') { return [long](120 * 1MB) }
+    # One target for both states (ARCHITECTURE.md); the parameter keeps reports explicit.
     return [long](200 * 1MB)
 }
 

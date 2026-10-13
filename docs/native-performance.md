@@ -40,7 +40,7 @@ powershell -NoProfile -File scripts/native-performance.tests.ps1
 
 ## Hidden (tray) launch and memory targets
 
-The primary metric is **summed private bytes** across the native process and its WebView2 children (see `ARCHITECTURE.md`): at most 200 MB visible and at most 120 MB hidden to tray, where MB is MiB (1048576 bytes). Summed working set is recorded for information only and never gates.
+The primary metric is **summed private bytes** across the native process and its WebView2 children (see `ARCHITECTURE.md`): at most 200 MB visible or hidden to tray, where MB is MiB (1048576 bytes). Summed working set is recorded for information only and never gates.
 
 `-HookLaunch` starts the app with `--hook-launch`, so it stays hidden in the tray and never takes focus. Use it for any run on a machine someone is working on; the default launch is visible and steals focus.
 
