@@ -7,6 +7,12 @@ use std::{
     time::{Duration, Instant},
 };
 
+/// Total hook budget (hard limit 300 ms). The receiver acks only after a durable fsync, whose tail
+/// latency on a loaded disk can pass 100 ms, so a single attempt may use half of the budget and the
+/// retry (same eventId, deduplicated) gets the rest.
+const HOOK_DEADLINE_MS: u64 = 280;
+const HOOK_ATTEMPT_MS: u64 = 140;
+
 fn deliver(
     dir: &Path,
     event: &clawdle_agent_adapters::AgentEvent,
@@ -18,7 +24,7 @@ fn deliver(
     for _ in 0..2 {
         let budget = deadline
             .saturating_duration_since(Instant::now())
-            .min(Duration::from_millis(90));
+            .min(Duration::from_millis(HOOK_ATTEMPT_MS));
         if budget < Duration::from_millis(2) {
             break;
         }
@@ -45,7 +51,7 @@ fn hook(dir: PathBuf) {
     // The watchdog covers stdin, metadata parsing, filesystem discovery, delivery and launch.
     // Dropping the receiver and returning from main ends any stuck worker thread.
     let (tx, rx) = std::sync::mpsc::channel();
-    let deadline = Instant::now() + Duration::from_millis(150);
+    let deadline = Instant::now() + Duration::from_millis(HOOK_DEADLINE_MS);
     std::thread::spawn(move || {
         let result = (|| {
             let mut raw = vec![];
