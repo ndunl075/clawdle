@@ -385,6 +385,9 @@ fn main() {
                 .build(app)?;
             if !std::env::args().any(|a| a == "--hook-launch") {
                 show(app.handle(), true).map_err(std::io::Error::other)?;
+            } else {
+                // A hook launch starts hidden in the tray without a hide transition.
+                webview_memory::apply(app.handle(), webview_memory::Transition::Hidden);
             }
             // Detect sleep and wall/monotonic continuity gaps conservatively. No agent polling.
             let handle = app.handle().clone();
