@@ -186,7 +186,7 @@ pub fn prepare_for(
             }
             let mut handler = json!({"type":"command","command":command,"args":args,"timeout":1});
             // Terminal hooks stay synchronous so a headless exit cannot drop them. The bridge
-            // enforces a 150 ms watchdog (typically ~30 ms), well inside the 1 s timeout.
+            // enforces a 280 ms deadline (typically ~30 ms), well inside the 1 s timeout.
             if !clawdle_agent_adapters::TERMINAL_HOOKS.contains(event) {
                 handler["async"] = json!(true);
             }
