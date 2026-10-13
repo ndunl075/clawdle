@@ -90,6 +90,21 @@ test('Enter activates focused buttons and focus returns to the opener after a di
   await expect(settings).toBeFocused();
   await expect(page.locator('.grid .tile').first()).toHaveText('');
 });
+test('after closing Settings with the mouse, typing and Enter submit the guess',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Settings',exact:true}).click();
+  await page.getByRole('button',{name:'Close dialog'}).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await page.keyboard.type('APPLE');await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog')).toBeHidden();
+  await expect(page.getByRole('group',{name:'Guess 1'}).locator('.tile.reveal')).toHaveCount(5);
+  await expect(page.getByRole('group',{name:'Guess 1'}).locator('.tile').first()).toHaveAttribute('aria-label',/^A, /);
+});
+test('an invalid word shakes the row and keeps it editable',async({page})=>{
+  await page.goto('/');await typeWord(page,'QQQQQ');
+  await expect(page.getByRole('group',{name:'Guess 1'})).toHaveClass(/shake/);
+  await expect(page.getByRole('group',{name:'Guess 1'})).toContainText('QQQQQ');
+});
 test('UTC rollover offers a new daily without replacing the unfinished board',async({page})=>{
   await page.clock.install({time:new Date('2026-10-12T23:59:55Z')});
   await page.goto('/');await typeWord(page,'APPLE');
