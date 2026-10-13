@@ -44,11 +44,11 @@ Check 'clean run completed' ((Get-FinalReportStatus -Failure $null -UnverifiedOb
 
 Check 'visible launch has no arguments and presentation visible' (@(Get-LaunchArguments).Count -eq 0 -and (Get-Presentation) -eq 'visible')
 Check 'hook launch passes only --hook-launch and presentation hidden' ((@(Get-LaunchArguments -HookLaunch) -join '|') -eq '--hook-launch' -and (Get-Presentation -HookLaunch) -eq 'hidden')
-Check 'hidden target is 120 MiB' ((Get-PrivateBytesTarget -Presentation 'hidden') -eq 120MB)
+Check 'hidden target is 200 MiB' ((Get-PrivateBytesTarget -Presentation 'hidden') -eq 200MB)
 Check 'visible target is 200 MiB' ((Get-PrivateBytesTarget -Presentation 'visible') -eq 200MB)
-Check 'hidden at target passes' ((Test-PrivateBytesTarget -PeakPrivateBytes 120MB -Presentation 'hidden') -eq $true)
-Check 'hidden over target fails' ((Test-PrivateBytesTarget -PeakPrivateBytes (120MB + 1) -Presentation 'hidden') -eq $false)
-Check '150 MiB passes visible but fails hidden' ((Test-PrivateBytesTarget -PeakPrivateBytes 150MB -Presentation 'visible') -eq $true -and (Test-PrivateBytesTarget -PeakPrivateBytes 150MB -Presentation 'hidden') -eq $false)
+Check 'hidden at target passes' ((Test-PrivateBytesTarget -PeakPrivateBytes 200MB -Presentation 'hidden') -eq $true)
+Check 'hidden over target fails' ((Test-PrivateBytesTarget -PeakPrivateBytes (200MB + 1) -Presentation 'hidden') -eq $false)
+Check '190 MiB passes in both states' ((Test-PrivateBytesTarget -PeakPrivateBytes 190MB -Presentation 'visible') -eq $true -and (Test-PrivateBytesTarget -PeakPrivateBytes 190MB -Presentation 'hidden') -eq $true)
 Check 'missing peak gives no verdict' ($null -eq (Test-PrivateBytesTarget -PeakPrivateBytes $null -Presentation 'visible'))
 $okRun = [pscustomobject]@{privateBytesTargetPass = $true}
 $badRun = [pscustomobject]@{privateBytesTargetPass = $false}
