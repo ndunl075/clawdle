@@ -14,7 +14,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-if (-not $IsWindows) { throw 'Requires PowerShell 7 on Windows.' }
+if ([Environment]::OSVersion.Platform -ne 'Win32NT') { throw 'Requires Windows.' }
 function Assert-PlainPath([string]$Path) {
     for ($cursor=$Path; $cursor; $cursor=[IO.Path]::GetDirectoryName($cursor)) {
         if ((Test-Path -LiteralPath $cursor) -and

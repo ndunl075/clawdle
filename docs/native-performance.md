@@ -1,6 +1,6 @@
 # Native Windows performance measurement
 
-Run `scripts/native-performance.ps1` from PowerShell 7 with an explicit built or installed Clawdle executable and a **new**, absolute fixture path directly beneath this checkout's `.local`, named `native-smoke*`. Close Clawdle first: its single-instance behavior would otherwise redirect the launch. The harness never stops a pre-existing instance, changes Claude hooks, sends synthetic hooks, or invokes a model.
+Run `scripts/native-performance.ps1` from Windows PowerShell 5.1 or PowerShell 7 with an explicit built or installed Clawdle executable and a **new**, absolute fixture path directly beneath this checkout's `.local`, named `native-smoke*`. Close Clawdle first: its single-instance behavior would otherwise redirect the launch. The harness never stops a pre-existing instance, changes Claude hooks, sends synthetic hooks, or invokes a model.
 
 ```powershell
 pwsh -NoProfile -File scripts/native-performance.ps1 `
