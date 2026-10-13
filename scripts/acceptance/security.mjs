@@ -222,7 +222,7 @@ async function itemReceiver(h) {
   pass('receiver', 'slow body (10 of 2000 bytes, then stall) rejected', slow.status === 413 && slow.firstByteMs < 2000, `status=${slow.status} rejectedAfter=${slow.firstByteMs}ms (server read bound 100 ms)`);
   // Slow-loris on headers: never finish the header block, one byte every 500 ms.
   const loris = await exchange(port, async s => { s.write(`POST /v1/events HTTP/1.1\r\nHost: ${host}\r\n`); for (let i = 0; i < 24; i++) { await sleep(500); s.write('X-A: b\r\n'); } }, { timeout: 14000 });
-  info('receiver', 'slow-loris on headers (observation, not gated)', `status=${loris.status} outcome=${loris.why}${loris.code ? ':' + loris.code : ''} after ${loris.totalMs}ms of a 12 s trickle; ${loris.why === 'timeout' ? 'server kept the half-open connection for the whole window' : 'server ended the connection'}`);
+  pass('receiver', 'slow-loris on headers is cut off within 3 s (receiver header timeout 500 ms)', loris.why !== 'timeout' && loris.totalMs < 3000, `outcome=${loris.why}${loris.code ? ':' + loris.code : ''} status=${loris.status} after ${loris.totalMs}ms of a 12 s one-line-per-500 ms trickle`);
   // Rate limit.
   const burst = await Promise.all(Array.from({ length: 150 }, () => exchange(port, s => s.write(request({ host, token, body: '{}' })), { timeout: 8000 })));
   const tally = {}; for (const r of burst) tally[r.status ?? r.code] = (tally[r.status ?? r.code] ?? 0) + 1;
@@ -551,8 +551,9 @@ async function main() {
     appSha256: sha256(app), bridgeSha256: sha256(bridge), appVersion: spawnSync('powershell', ['-NoProfile', '-Command', `(Get-Item '${app}').VersionInfo.ProductVersion`], { encoding: 'utf8' }).stdout.trim(),
   };
   console.log(JSON.stringify(meta, null, 1));
-  if (appRunning()) throw new Error('clawdle-desktop.exe already running; refusing to start');
   await acquireLock();
+  for (let i = 0; i < 40 && appRunning(); i++) { if (i === 0) console.log('clawdle-desktop.exe is running (another session); waiting under the lock'); await sleep(15000); }
+  if (appRunning()) throw new Error('clawdle-desktop.exe still running after 10 minutes; refusing to start');
   let h;
   try {
     if (only.has('receiver') || only.has('privacy') || only.has('acl')) {

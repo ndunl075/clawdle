@@ -12,15 +12,15 @@ The script takes `.local/locks/machine.lock` in the main checkout (waits if held
 
 | | |
 | --- | --- |
-| Date | 2026-10-12 (evening, local), tag `t3`: 74 pass, 0 fail, 9 info |
+| Date | 2026-10-12 (evening, local), tag `t6`: 75 pass, 0 fail, 8 info |
 | OS | Windows 11 Home 10.0.26200 |
-| Source | `main` at `1000849`; binaries built from it |
-| `clawdle-desktop.exe` 0.1.0 (release build, not the NSIS installer) | sha256 `572cfc8fcf7c913b05a7b664b86f7bde8ecb890509bef3e09b5a6703cb99405f` |
-| `clawdle-bridge.exe` | sha256 `48e3df5eb71fd24113d0c57e471d84d927672302f1be09e39847785ef8c18e36` |
+| Source | `main` at `869df45` (includes the PR #34 receiver header-timeout fix); `target/release` binaries built from the fix at 23:19-23:20 local |
+| `clawdle-desktop.exe` 0.1.0 (release build, not the NSIS installer) | sha256 `838db3163408b2c9b3ad1c6af42fdcd6837b401bfbf66fa85ecf0c8bead52525` |
+| `clawdle-bridge.exe` | sha256 `c19a496554c7b9bd4c79622508adbe8014e263353142837d58072deed558300b` |
 | Claude Code | 2.1.282, synthetic provider only |
 | Node / Python | v22.21.0 / 3.13.14 |
 
-Two earlier runs (`t1`, `t2`) failed on harness defects, not product defects, and were fixed before `t3`. In `t1` the smoke script ran from a worktree whose `.local` it does not own. In `t2` the ACL check demanded "protected" on a child directory that inherits an owner-only ACL, a substring check mistook "could not be saved" for "saved", the traffic gate lumped WebView2 in with the app, and the cleanup did not remove a planted file symlink (removed by hand, link only).
+Two earlier runs (`t1`, `t2`) failed on harness defects, not product defects, and were fixed before `t3`. `t3` (binaries from `1000849`, hashes `572cfc8f...` / `48e3df5e...`) found the unbounded header slow-loris described below; after PR #34, `t4` aborted because another session's app was running (the script now waits for it under the lock), `t5` passed with the slow-loris still informational, and `t6` made it a gated check. In `t1` the smoke script ran from a worktree whose `.local` it does not own. In `t2` the ACL check demanded "protected" on a child directory that inherits an owner-only ACL, a substring check mistook "could not be saved" for "saved", the traffic gate lumped WebView2 in with the app, and the cleanup did not remove a planted file symlink (removed by hand, link only).
 
 ## Results
 
@@ -30,7 +30,7 @@ All against the live app's receiver (OS-assigned port on 127.0.0.1). Timings are
 
 | Probe | Result |
 | --- | --- |
-| Control: `GET /v1/health`, correct token and Host | 200 in 2 ms; body is protocol version and runtime epoch only, no token |
+| Control: `GET /v1/health`, correct token and Host | 200 in 2-3 ms; body is protocol version and runtime epoch only, no token |
 | Control: correct auth, body `{}` | 400 (auth passed, validation rejected) |
 | No Authorization, wrong token, truncated token | 401, 1 ms |
 | `Origin: http://evil.example`, `Origin: null` | 401, 1 ms |
@@ -40,12 +40,11 @@ All against the live app's receiver (OS-assigned port on 127.0.0.1). Timings are
 | 9000 B body (cap is 8 KiB) | 413, 1 ms |
 | 1 MiB body | connection reset after 5 ms (no status read) |
 | Slow body: header says 2000 B, 10 B sent, then stall | 413 after 107 ms (server bound is 100 ms) |
+| Slow-loris on headers (header block never finished, one line per 500 ms) | connection reset after 515 ms (gated: must end within 3 s); in `t3`, before the fix, it stayed open for the whole 14 s window |
 | 150 concurrent authenticated posts | 100 x 400, 50 x 429 |
 | Journal rows created by any rejected request | 0 (agent rows 0 before and after) |
 
 Listening: `Get-NetTCPConnection` for the app's process tree shows the receiver port only on `127.0.0.1`; no `0.0.0.0`, `::` or `::1` listener on it. The only other listener is the harness CDP port 9342 on 127.0.0.1. Direct connects: `127.0.0.1` connects (control); `::1` and `127.0.0.2` are refused in 2 ms; the machine's LAN IPv4 address is refused (a RST after about 2 s, not a connection).
-
-Observation, not gated: a slow-loris on the **headers** (header block never finished, one line per 500 ms) is not cut off. The half-open connection was still open at the end of a 12 s trickle (14 s window). Only the body read is bounded (100 ms). The receiver is loopback-only, so exploiting this needs a local process.
 
 Not covered: IPv6 LAN addresses (the machine had no non-link-local ones) and Windows Firewall behavior.
 
@@ -98,9 +97,8 @@ Fault: a second SQLite connection held `BEGIN IMMEDIATE` (the write lock) on the
 
 ## Findings for the architect
 
-No product bug was found in items 1, 2, 3 or 5. Two observations are open:
+No product bug was found in items 1, 2, 3 or 5. The header slow-loris found by the first runs is fixed (PR #34) and re-verified in `t6`. One observation is open:
 
-1. Slow-loris on request headers is not bounded (item 1).
-2. WebView2 browser-internal connections to Microsoft addresses during gameplay (item 4). Either reword the checklist line to cover the application process, or address the WebView2 behavior.
+1. WebView2 browser-internal connections to Microsoft addresses during gameplay (item 4: in `t6`, 52.96.x.x:443 in 33 of 33 samples and 150.171.28.11:443 in 6 of 33). Either reword the checklist line to cover the application process, or address the WebView2 behavior.
 
 Not run here: the NSIS-installed build (these runs use `target/release`) and any visible-window behavior.
