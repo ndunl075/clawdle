@@ -298,28 +298,36 @@ fn native_always_on_top(app: tauri::AppHandle, enabled: bool) -> Result<(), Stri
 }
 fn geometry(app: &tauri::AppHandle, dir: &std::path::Path) {
     if let Some(w) = app.get_webview_window("main") {
-        if let Ok(bytes) = std::fs::read(dir.join("geometry.json")) {
-            if let Ok(v) = serde_json::from_slice::<Value>(&bytes) {
-                let mut width = v["width"].as_f64().unwrap_or(420.0).clamp(360.0, 1000.0);
-                let mut height = v["height"].as_f64().unwrap_or(650.0).clamp(600.0, 1200.0);
-                if let Ok(Some(m)) = w.current_monitor() {
-                    let factor = m.scale_factor();
-                    let pos = m.work_area().position.to_logical::<f64>(factor);
-                    let size = m.work_area().size.to_logical::<f64>(factor);
-                    width = width.min(size.width);
-                    height = height.min(size.height);
-                    let _ = w.set_size(tauri::LogicalSize::new(width, height));
-                    let x = v["x"]
-                        .as_f64()
-                        .unwrap_or(pos.x)
-                        .clamp(pos.x, (pos.x + size.width - width).max(pos.x));
-                    let y = v["y"]
-                        .as_f64()
-                        .unwrap_or(pos.y)
-                        .clamp(pos.y, (pos.y + size.height - height).max(pos.y));
-                    let _ = w.set_position(tauri::LogicalPosition::new(x, y));
-                }
-            }
+        // Saved geometry when present; otherwise the default (centred) placement. Either way the
+        // window is clamped into the monitor work area so it never sits behind the taskbar.
+        let saved = std::fs::read(dir.join("geometry.json"))
+            .ok()
+            .and_then(|bytes| serde_json::from_slice::<Value>(&bytes).ok());
+        let current = w
+            .outer_position()
+            .ok()
+            .zip(w.scale_factor().ok())
+            .map(|(p, f)| p.to_logical::<f64>(f));
+        let fallback = serde_json::json!({"x": current.map(|p| p.x), "y": current.map(|p| p.y)});
+        let v = saved.unwrap_or(fallback);
+        let mut width = v["width"].as_f64().unwrap_or(420.0).clamp(360.0, 1000.0);
+        let mut height = v["height"].as_f64().unwrap_or(650.0).clamp(600.0, 1200.0);
+        if let Ok(Some(m)) = w.current_monitor() {
+            let factor = m.scale_factor();
+            let pos = m.work_area().position.to_logical::<f64>(factor);
+            let size = m.work_area().size.to_logical::<f64>(factor);
+            width = width.min(size.width);
+            height = height.min(size.height);
+            let _ = w.set_size(tauri::LogicalSize::new(width, height));
+            let x = v["x"]
+                .as_f64()
+                .unwrap_or(pos.x)
+                .clamp(pos.x, (pos.x + size.width - width).max(pos.x));
+            let y = v["y"]
+                .as_f64()
+                .unwrap_or(pos.y)
+                .clamp(pos.y, (pos.y + size.height - height).max(pos.y));
+            let _ = w.set_position(tauri::LogicalPosition::new(x, y));
         }
     }
 }
