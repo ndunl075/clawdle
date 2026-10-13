@@ -4,7 +4,7 @@ A little word break while your coding agent works. Clawdle is a free, local five
 
 ## Install
 
-Download `Clawdle_0.1.0_x64-setup.exe` (the standard installer) or the offline variant, which bundles WebView2. Compare `SHA256SUMS.txt` before installing. The installers are unsigned, so Windows may show a trust warning.
+Download `Clawdle-v0.1.0-windows-x64-setup.exe` (the standard installer, which fetches WebView2 if needed) or `Clawdle-v0.1.0-windows-x64-offline-setup.exe`, which bundles WebView2. Compare `SHA256SUMS.txt` before installing. The installers are unsigned, so Windows may show a trust warning.
 
 After installing, open **Settings → Claude connection settings** and install the local hooks for your user or a single project. Then restart your Claude Code session.
 
