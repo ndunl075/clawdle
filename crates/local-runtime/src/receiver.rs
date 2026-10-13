@@ -118,6 +118,15 @@ impl Drop for Receiver {
 const HEADER_READ_TIMEOUT: Duration = Duration::from_millis(500);
 const CONNECTION_TIMEOUT: Duration = Duration::from_secs(2);
 
+fn is_connection_error(e: &std::io::Error) -> bool {
+    matches!(
+        e.kind(),
+        std::io::ErrorKind::ConnectionRefused
+            | std::io::ErrorKind::ConnectionAborted
+            | std::io::ErrorKind::ConnectionReset
+    )
+}
+
 pub async fn start(
     dir: PathBuf,
     repo: Arc<Repository>,
@@ -148,7 +157,15 @@ pub async fn start(
             tokio::select! {
                 _ = &mut rx => break,
                 accepted = listener.accept() => {
-                    let Ok((stream, _)) = accepted else { continue };
+                    let stream = match accepted {
+                        Ok((stream, _)) => stream,
+                        Err(e) if is_connection_error(&e) => continue,
+                        // Out of handles or buffers: back off like axum::serve instead of spinning.
+                        Err(_) => {
+                            tokio::time::sleep(Duration::from_secs(1)).await;
+                            continue;
+                        }
+                    };
                     let service = hyper_util::service::TowerToHyperService::new(app.clone());
                     tokio::spawn(async move {
                         let connection = hyper::server::conn::http1::Builder::new()
@@ -276,6 +293,7 @@ mod tests {
         })
         .await;
         assert!(closed.is_ok(), "slow client was never disconnected");
-        assert!(started.elapsed() < Duration::from_secs(3));
+        // Well under CONNECTION_TIMEOUT, so only the header-read timeout can explain the cut-off.
+        assert!(started.elapsed() < HEADER_READ_TIMEOUT + Duration::from_millis(700));
     }
 }

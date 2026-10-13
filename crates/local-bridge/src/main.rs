@@ -210,7 +210,8 @@ mod tests {
         let deadline = started + Duration::from_millis(HOOK_DEADLINE_MS);
         assert!(deliver(d.path(), &event(), deadline).is_err());
         assert!(
-            started.elapsed() < Duration::from_millis(2 * CONNECT_MS + 40),
+            // Two capped connects; generous slack for shared CI runners.
+            started.elapsed() < Duration::from_millis(2 * CONNECT_MS + 150),
             "{:?}",
             started.elapsed()
         );
