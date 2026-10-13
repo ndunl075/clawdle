@@ -32,6 +32,15 @@ export class AppController {
         for(const r of Object.values(s.races))if(!r||!['offered','running','terminal'].includes(r.state)||typeof r.raceId!=='string'||typeof r.runtimeEpoch!=='string'||typeof r.gameId!=='string'||typeof r.provider!=='string'||typeof r.sessionId!=='string'||typeof r.turnId!=='string'||!Number.isSafeInteger(r.startedSeq)||!Number.isSafeInteger(r.lastSeq)||typeof r.ranked!=='boolean'||!Number.isFinite(r.startedMonoMs))throw new Error('Saved races need recovery; original storage has been preserved');
         for(const run of Object.values(s.speedruns))if(!run||!['running','finished','interrupted'].includes(run.status)||!Number.isFinite(run.deadlineMonoMs)||!Number.isFinite(run.solved))throw new Error('Saved timed runs need recovery; original storage has been preserved');
         this.state.quarantinedGames ??= {};
+        // Restore quarantined games that now validate, e.g. desktop saves quarantined for a +00:00
+        // timestamp. Never replace a live game with the same id; anything still invalid stays put.
+        for (const [id, value] of Object.entries(this.state.quarantinedGames)) {
+            const checked = validateSavedPuzzle(value);
+            if (checked.valid && checked.puzzle.gameId === id && !this.state.games[id]) {
+                this.state.games[id] = checked.puzzle;
+                delete this.state.quarantinedGames[id];
+            }
+        }
         for (const [id, value] of Object.entries(this.state.games)) {
             const checked = validateSavedPuzzle(value);
             if (checked.valid&&checked.puzzle.gameId===id)
