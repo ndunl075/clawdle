@@ -607,6 +607,8 @@ dependencies = [
  "chrono",
  "clawdle-agent-adapters",
  "directories",
+ "hyper",
+ "hyper-util",
  "rand 0.8.8",
  "reqwest 0.12.28",
  "rusqlite",

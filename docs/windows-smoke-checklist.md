@@ -9,13 +9,13 @@ date, and outcome for every check. An unchecked item is unverified.
 - [ ] Real asynchronous silent hooks; malformed input and receiver-down exit budget.
 - [ ] Existing unrelated hooks/settings survive install, repeat install, remove.
 - [ ] Spaces and Unicode in installation/project paths.
-- [ ] Typing in an IDE continues without focus loss during automatic presentation.
+- [ ] Typing in an IDE continues without focus loss during automatic presentation. *(Foreground probe with Notepad passed 2026-10-12; no IDE, no live typing.)*
 - [ ] Hook second launch never activates or steals focus.
-- [ ] Tray close/reopen preserves puzzle; explicit Quit stops listener.
+- [ ] Tray close/reopen preserves puzzle; explicit Quit stops listener. *(Close/reopen passed 2026-10-12; explicit Quit not yet run.)*
 - [ ] Geometry clamps to monitor work area after monitor removal.
 - [ ] Player-first, agent-first, hidden Stop, short turn, two sessions, child Stop.
 - [ ] Provider error, session end, sleep/resume, crash recovery, missed notification.
-- [ ] Permission attention never approves or operates Claude.
+- [x] Permission attention never approves or operates Claude. *(Claude Code 2.1.282, 2026-10-12; see claude-compatibility.md.)*
 - [ ] Wrong token/Origin/Host/oversized/slow body rejected on IPv4 loopback only.
 - [ ] Private endpoint/token/mailbox/settings-backup ACL and reparse-point checks.
 - [ ] Save failure never acknowledges a durable move or awards ranked progression.
@@ -39,3 +39,27 @@ Native UI helper failure: `foreground window did not report a process id`, repro
 Later native UI revalidation displayed the actual light-theme game and native Export dialog successfully; the earlier helper failure did not reproduce. A valid native export file was created and retained privately. Reliable filename selection, cancellation, IDE focus, tray and physical sleep/resume checks remain unverified. Another foreground application interfered with dialog targeting, so this partial observation is not a completed GUI acceptance run.
 
 The sustained performance attempt completed two 60-second idle intervals before a descendant-verification failure on the third launch. Partial measurements and limitations are recorded in [native-smoke.md](native-smoke.md); this failed invocation does not check off the complete performance gate.
+
+## Executed on 2026-10-12 (evening): packaged GUI and memory
+
+Windows 11 Home 10.0.26200. Built from main `1000849`: app SHA-256 `572CFC8FCF7C913B05A7B664B86F7BDE8ECB890509BEF3E09B5A6703CB99405F`, bridge SHA-256 `48E3DF5EB71FD24113D0C57E471D84D927672302F1BE09E39847785EF8C18E36`. Isolated test profiles under `.local/native-smoke-gui-*-1012b`. The real UI was driven through the WebView2 remote-debugging port (Playwright `connectOverCDP`). Window visibility and the foreground process were read with Win32 `IsWindowVisible` and `GetForegroundWindow`.
+
+| Check | Result |
+| --- | --- |
+| Normal launch shows the window | Passed |
+| Automatic races enabled, and project hooks installed, through the real Settings and Connection UI | Passed |
+| Window close hides to tray; the process stays alive | Passed |
+| Real Claude Code 2.1.282 turn while hidden (SessionStart, UserPromptSubmit, Stop) | Passed |
+| Race auto-show makes the window visible | Passed |
+| Auto-show never takes the foreground: Notepad stayed in front for all 1,268 samples at 25 ms over 40 s | Passed |
+| A second launch reopens the existing instance | Passed |
+| Letters typed into today's puzzle survive close and reopen | Passed |
+
+Not covered by this run: explicit tray Quit, typing in an IDE, Save As selection and cancellation, physical sleep/resume, monitor removal.
+
+Memory, same build, summed private bytes across 3 × 60 s launches (target: at most 200 MB visible or hidden):
+
+| Presentation | Peak private | Mean private | Peak working set | Launch to first durable puzzle |
+| --- | --- | --- | --- | --- |
+| Visible | 184.8–188.2 MiB, **passes** | 179.2–183.5 MiB | 407–412 MiB | 3.3–6.8 s (cold-launch aim of 2 s not met; the readiness proxy includes harness inspection overhead) |
+| Hidden (main `9585164` plus #27) | 182.9–187.6 MiB, **passes** | 180.8–184.2 MiB | 381–389 MiB | n/a |
