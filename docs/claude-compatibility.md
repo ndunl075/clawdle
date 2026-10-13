@@ -67,7 +67,25 @@ Windows 11 Home 10.0.26200, Claude Code 2.1.282 (the version installed on this h
 
 Findings that need product decisions:
 
-- **Lost terminal in headless mode.** One headless run in about ten lost the root `Stop`. The bridge is installed as `async: true` with a 1 s timeout, and the likely cause is that the async hook does not finish before `claude --print` exits. Interactive sessions keep running after `Stop`, so this is unconfirmed there. A lost terminal leaves the race to the conservative interruption path.
+- **Lost terminal in headless mode.** One headless run in about ten lost the root `Stop`. Investigated and mitigated below ("Terminal delivery"). Interactive sessions keep running after `Stop`, so the interactive case is unconfirmed.
 - **Background subagents start a new root turn.** Claude delivers a background agent's result in a new turn that the user did not type. The app treats it as a new race start.
 
 No hosted model was invoked. Reports and profiles are retained privately under `.local/native-smoke-cli-*-1012b`.
+
+### 2026-10-12: terminal delivery loss (Stop / StopFailure) in headless `--print`
+
+Same host and Claude Code 2.1.282, app hidden (`--hook-launch`, test profile), harness `scripts/claude-lifecycle-smoke.py`, fresh fixture per run. "Lost" means the journal never held the terminal event after the harness's 5 s wait. Counts are runs, not events.
+
+| Bridge / hook install | success lost | provider-error lost | subagent lost |
+| --- | ---: | ---: | ---: |
+| Before: every hook `async: true`, 150 ms deadline (main `9585164`) | 0/30 | 5/30 | 0/10 |
+| Stop/StopFailure sync, 150 ms deadline | 1/30 | 1/30 | not run |
+| After: Stop/StopFailure sync (`timeout: 1`), 280 ms deadline | 0/30 | 2/40 | 0/10 |
+
+Root cause (from a temporary, uncommitted diagnostic bridge that logged each hook process's stages to a file):
+
+- With async hooks, many StopFailure hook processes **never started or were killed mid-delivery** when `claude --print` exited (a 40-run provider-error batch with the diagnostic async build lost 29 turns' terminal, a noisier moment on the host; the same-code non-diagnostic baseline lost 5/30). Async hooks are not awaited at exit.
+- With synchronous terminal hooks every hook process ran to completion in the traced batch (40/40 StopFailure processes logged). The remaining sync losses were all the bridge's 150 ms deadline expiring while the receiver's durable (`synchronous=FULL`) append was still pending; median delivery was about 6 ms, p95 about 12 ms, with rare tails above 100 ms.
+- The bridge deadline therefore moved from 150 ms to 280 ms (single attempt 140 ms, then one same-`eventId` retry), still inside the 300 ms hard budget. Only a stalled receiver ever reaches it; non-terminal hooks stay async and never block Claude.
+
+Limits of this evidence: the after column still lost 2/40 provider-error runs and was not traced (a diagnostic build of the same logic lost 0/60), so the residual rate is not zero and its cause is unconfirmed. The subagent scenario lost nothing on either build (10 and 10), so it does not discriminate. Sample sizes are small and the host load varied between batches. Interactive sessions were not measured. Bridge SHA-256: before `0D638F78...C5`, after `EABB973E...C0`.
