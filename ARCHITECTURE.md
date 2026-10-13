@@ -15,7 +15,7 @@ The primary experience is a compact desktop game that appears while Claude Code 
 - All puzzle generation, validation, gameplay, statistics, and agent integration run locally.
 - Installed desktop gameplay works without an internet connection.
 - Clawdle observes agent lifecycle metadata. It never operates the agent, grants permissions, edits a project, or verifies generated code.
-- Hook failures must leave the coding session unaffected. Hooks run asynchronously, produce no decision output, and exit quickly.
+- Hook failures must leave the coding session unaffected. Activity hooks run asynchronously; the terminal hooks (`Stop`, `StopFailure`) run synchronously under a bounded timeout so a headless exit cannot drop them. No hook produces decision output, and all exit quickly.
 - Automatic presentation never takes keyboard focus from the IDE or terminal.
 - Closing a window preserves the puzzle. A race outcome never changes a daily streak.
 
@@ -334,7 +334,7 @@ Normalize `StopFailure` as `agent.turn_completed` with `endReason: 'provider_err
 
 Command hooks receive stdin JSON. Allowlist `session_id`, `prompt_id`, event name, scope metadata, notification subtype, and coarse termination flags. Discard `prompt`, response text, tool input/output, notification message bodies, and transcript paths; never open the transcript.
 
-Install asynchronous command hooks. The bridge writes no stdout/stderr context, emits no permission or Stop decision, and returns exit code 0 on malformed input or delivery failure. It enforces its own short deadline because async-hook timeout behavior must not be relied upon.
+Install asynchronous command hooks for activity events and synchronous, 1 s-timeout hooks for `Stop` and `StopFailure`. The bridge writes no stdout/stderr context, emits no permission or Stop decision, and returns exit code 0 on malformed input or delivery failure. It enforces its own short deadline because async-hook timeout behavior must not be relied upon.
 
 #### System-initiated turns
 
@@ -358,7 +358,7 @@ The installer:
 2. Creates a local backup and validates the existing JSON. If the file is unsupported or invalid, offers exact manual setup instructions without replacing it.
 3. Merges only Clawdle-owned handlers, preserving all other settings and hooks.
 4. Generates an absolute executable path with tested shell/path handling, including spaces and Unicode on Windows.
-5. Adds `async: true` and no decision-producing output configuration.
+5. Adds `async: true` for activity hooks and no decision-producing output configuration. The terminal hooks (`Stop`, `StopFailure`) are installed synchronously (no `async`) with `timeout: 1`, because headless `claude --print` exits right after them and can drop an async handler before it delivers. The bridge's own 150 ms watchdog keeps the synchronous wait small and never produces decision output. Upgrades remove the previously recorded handlers by exact manifest match before inserting the new format, so removal still finds older installs.
 6. Writes through a temporary file and atomic replacement. It aborts if the settings changed after the initial read.
 7. Saves an ownership manifest outside Claude's settings schema, with hashes of exact inserted handlers.
 8. Runs a synthetic local bridge check, then tells the user whether their Claude session needs refreshing for the tested version.
@@ -389,7 +389,7 @@ The generated configuration follows the documented command-hook schema. This is 
             "type": "command",
             "command": "/absolute/path/clawdle-bridge",
             "args": ["hook", "--provider", "claude"],
-            "async": true
+            "timeout": 1
           }
         ]
       }

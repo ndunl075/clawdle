@@ -184,8 +184,12 @@ pub fn prepare_for(
             if development {
                 args.push("--development");
             }
-            let handler =
-                json!({"type":"command","command":command,"args":args,"async":true,"timeout":1});
+            let mut handler = json!({"type":"command","command":command,"args":args,"timeout":1});
+            // Terminal hooks stay synchronous so a headless exit cannot drop them. The bridge
+            // enforces a 280 ms deadline (typically ~30 ms), well inside the 1 s timeout.
+            if !clawdle_agent_adapters::TERMINAL_HOOKS.contains(event) {
+                handler["async"] = json!(true);
+            }
             let groups = hooks
                 .entry((*event).to_owned())
                 .or_insert(json!([]))
@@ -312,7 +316,9 @@ mod tests {
             v["hooks"]["Stop"][1]["hooks"][0]["args"],
             json!(["hook", "--provider", "claude"])
         );
-        assert_eq!(v["hooks"]["Stop"][1]["hooks"][0]["async"], true);
+        assert!(v["hooks"]["Stop"][1]["hooks"][0].get("async").is_none());
+        assert_eq!(v["hooks"]["Stop"][1]["hooks"][0]["timeout"], 1);
+        assert_eq!(v["hooks"]["PostToolUse"][0]["hooks"][0]["async"], true);
         v["hooks"]["Stop"][1]["hooks"][0]["command"] = "user-edited".into();
         fs::write(&path, v.to_string()).unwrap();
         prepare(&path, &manifest, &exe(d.path()), false)
@@ -353,5 +359,116 @@ mod tests {
         fs::write(&p, b"invalid").unwrap();
         assert!(prepare(&p, &d.path().join("private"), &exe(d.path()), true).is_err());
         assert_eq!(fs::read(p).unwrap(), b"invalid");
+    }
+    #[test]
+    fn terminal_hooks_are_sync_and_others_async() {
+        let d = tempfile::tempdir().unwrap();
+        let path = d.path().join("settings.json");
+        prepare(&path, &d.path().join("private"), &exe(d.path()), true)
+            .unwrap()
+            .commit()
+            .unwrap();
+        let v: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        for event in clawdle_agent_adapters::HOOKS {
+            let h = &v["hooks"][*event][0]["hooks"][0];
+            assert_eq!(h["timeout"], 1, "{event}");
+            if clawdle_agent_adapters::TERMINAL_HOOKS.contains(event) {
+                assert!(h.get("async").is_none(), "{event} must be synchronous");
+            } else {
+                assert_eq!(h["async"], true, "{event}");
+            }
+        }
+        assert_eq!(
+            clawdle_agent_adapters::TERMINAL_HOOKS,
+            ["Stop", "StopFailure"]
+        );
+    }
+    /// Writes the pre-change install (every handler async) plus its ownership manifest.
+    fn legacy_install(path: &Path, private: &Path, exe: &Path) {
+        let mut hooks = serde_json::Map::new();
+        let mut handlers = vec![];
+        for event in clawdle_agent_adapters::HOOKS {
+            let handler = json!({"type":"command","command":exe.to_str().unwrap(),"args":["hook","--provider","claude"],"async":true,"timeout":1});
+            hooks.insert((*event).into(), json!([{"hooks":[handler.clone()]}]));
+            handlers.push(json!({"event":event,"hash":hash(&handler),"handler":handler}));
+        }
+        hooks
+            .get_mut("Stop")
+            .unwrap()
+            .as_array_mut()
+            .unwrap()
+            .insert(
+                0,
+                json!({"hooks":[{"type":"command","command":"echo mine"}]}),
+            );
+        fs::write(path, json!({"theme":"dark","hooks":hooks}).to_string()).unwrap();
+        fs::create_dir_all(private).unwrap();
+        let key = format!(
+            "{:x}",
+            Sha256::digest(path.as_os_str().to_string_lossy().as_bytes())
+        );
+        fs::write(
+            private.join(format!("claude-{key}.json")),
+            json!({"handlers":handlers}).to_string(),
+        )
+        .unwrap();
+    }
+    #[test]
+    fn upgrade_replaces_legacy_async_terminal_handlers() {
+        let d = tempfile::tempdir().unwrap();
+        let path = d.path().join("settings.json");
+        let private = d.path().join("private");
+        legacy_install(&path, &private, &exe(d.path()));
+        prepare(&path, &private, &exe(d.path()), true)
+            .unwrap()
+            .commit()
+            .unwrap();
+        let v: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        assert_eq!(v["theme"], "dark");
+        for event in ["Stop", "StopFailure"] {
+            let all: Vec<&Value> = v["hooks"][event]
+                .as_array()
+                .unwrap()
+                .iter()
+                .flat_map(|g| g["hooks"].as_array().unwrap())
+                .filter(|h| h["command"] != "echo mine")
+                .collect();
+            assert_eq!(all.len(), 1, "{event}: no duplicate or stale handler");
+            assert!(all[0].get("async").is_none(), "{event}");
+        }
+        assert_eq!(v["hooks"]["Stop"][0]["hooks"][0]["command"], "echo mine");
+        assert_eq!(v["hooks"]["PostToolUse"].as_array().unwrap().len(), 1);
+        assert_eq!(v["hooks"]["PostToolUse"][0]["hooks"][0]["async"], true);
+        assert_eq!(
+            owned_count(&path, &private),
+            clawdle_agent_adapters::HOOKS.len()
+        );
+    }
+    #[test]
+    fn uninstall_removes_legacy_and_upgraded_handlers() {
+        let d = tempfile::tempdir().unwrap();
+        let private = d.path().join("private");
+        let legacy = d.path().join("legacy.json");
+        legacy_install(&legacy, &private, &exe(d.path()));
+        prepare(&legacy, &private, &exe(d.path()), false)
+            .unwrap()
+            .commit()
+            .unwrap();
+        let v: Value = serde_json::from_slice(&fs::read(&legacy).unwrap()).unwrap();
+        assert_eq!(v["hooks"]["Stop"].as_array().unwrap().len(), 1);
+        assert_eq!(v["hooks"]["Stop"][0]["hooks"][0]["command"], "echo mine");
+        assert!(v["hooks"]["StopFailure"].as_array().unwrap().is_empty());
+        let current = d.path().join("current.json");
+        prepare(&current, &private, &exe(d.path()), true)
+            .unwrap()
+            .commit()
+            .unwrap();
+        prepare(&current, &private, &exe(d.path()), false)
+            .unwrap()
+            .commit()
+            .unwrap();
+        let v: Value = serde_json::from_slice(&fs::read(&current).unwrap()).unwrap();
+        assert!(v["hooks"]["Stop"].as_array().unwrap().is_empty());
+        assert!(v["hooks"]["StopFailure"].as_array().unwrap().is_empty());
     }
 }

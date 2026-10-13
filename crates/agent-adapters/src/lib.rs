@@ -16,6 +16,10 @@ pub const HOOKS: &[&str] = &[
     "SubagentStop",
 ];
 
+/// Hooks that end a turn. Headless `claude --print` exits right after these fire, so they are
+/// installed as synchronous handlers; an async handler can be killed before it delivers.
+pub const TERMINAL_HOOKS: &[&str] = &["Stop", "StopFailure"];
+
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct AgentEvent {
