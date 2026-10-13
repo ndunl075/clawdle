@@ -1,6 +1,6 @@
 # Native Windows performance measurement
 
-Run `scripts/native-performance.ps1` from PowerShell 7 with an explicit built or installed Clawdle executable and a **new**, absolute fixture path directly beneath this checkout's `.local`, named `native-smoke*`. Close Clawdle first: its single-instance behavior would otherwise redirect the launch. The harness never stops a pre-existing instance, changes Claude hooks, sends synthetic hooks, or invokes a model.
+Run `scripts/native-performance.ps1` from Windows PowerShell 5.1 or PowerShell 7 with an explicit built or installed Clawdle executable and a **new**, absolute fixture path directly beneath this checkout's `.local`, named `native-smoke*`. Close Clawdle first: its single-instance behavior would otherwise redirect the launch. The harness never stops a pre-existing instance, changes Claude hooks, sends synthetic hooks, or invokes a model.
 
 ```powershell
 pwsh -NoProfile -File scripts/native-performance.ps1 `
@@ -68,3 +68,14 @@ The self-test also covers launch-argument construction, presentation, and target
 ```powershell
 powershell -NoProfile -File scripts/native-performance.tests.ps1
 ```
+
+## Hidden-state evidence on Windows 11 (2026-10-12)
+
+Windows 11 Home 10.0.26200, 16 logical processors, Windows PowerShell 5.1.26100. `-HookLaunch`, 3 launches of 60 s at 1 s sampling, 0 unverified observations.
+
+| Build | App SHA-256 | Peak private (per launch) | Mean private | Peak working set |
+| --- | --- | --- | --- | --- |
+| main `5637c04` | `8DE27F22…` | 186.2, 182.8, 188.6 MiB | 180.1–185.9 MiB | 403.8–413.4 MiB |
+| plus hidden-start memory level | `0E4237E8…` | 187.6, 182.9, 183.7 MiB | 180.8–184.2 MiB | 381.4–389.2 MiB |
+
+Both runs fail the 120 MB hidden target. Applying WebView2 `MemoryUsageTargetLevel=Low` at a hidden start trims about 20 MiB of working set but leaves private bytes unchanged. The GitHub-hosted runner reported about 120 MiB for the same state; it has no physical GPU, so it is not representative of a laptop.

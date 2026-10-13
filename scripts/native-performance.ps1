@@ -14,7 +14,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-if (-not $IsWindows) { throw 'Requires PowerShell 7 on Windows.' }
+if ([Environment]::OSVersion.Platform -ne 'Win32NT') { throw 'Requires Windows.' }
 function Assert-PlainPath([string]$Path) {
     for ($cursor=$Path; $cursor; $cursor=[IO.Path]::GetDirectoryName($cursor)) {
         if ((Test-Path -LiteralPath $cursor) -and
@@ -85,7 +85,7 @@ function Write-FixtureJson([string]$Path, $Value) {
     Assert-PlainPath ($Path + '.tmp')
     $content = $Value | ConvertTo-Json -Depth 12
     [IO.File]::WriteAllText(($Path + '.tmp'),$content,[Text.UTF8Encoding]::new($false))
-    [IO.File]::Move(($Path + '.tmp'),$Path,$true)
+    if ([IO.File]::Exists($Path)) { [IO.File]::Replace(($Path + '.tmp'),$Path,[NullString]::Value) } else { [IO.File]::Move(($Path + '.tmp'),$Path) }
 }
 function Save-Progress([string]$Phase) {
     Write-FixtureJson $progressPath ([ordered]@{updatedUtc=[DateTimeOffset]::UtcNow.ToString('o');phase=$Phase;
@@ -294,7 +294,9 @@ try {
         $samples = [Collections.Generic.List[object]]::new()
         $info = [Diagnostics.ProcessStartInfo]::new($appPath)
         $info.UseShellExecute = $false
-        foreach ($argument in $launchArguments) { $info.ArgumentList.Add($argument) }
+        # ProcessStartInfo.ArgumentList is .NET Core only; the fixed switches need no quoting.
+        if ($launchArguments | Where-Object { $_ -notmatch '^--[a-z-]+$' }) { throw 'Unexpected launch argument.' }
+        $info.Arguments = $launchArguments -join ' '
         $info.Environment['CLAWDLE_TEST_MODE']='1'
         $info.Environment['CLAWDLE_DATA_DIR']=$profile
         $info.Environment['WEBVIEW2_USER_DATA_FOLDER']=Join-Path $profile 'webview'
