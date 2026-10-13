@@ -5,7 +5,7 @@ let recoveryPlatform:Awaited<ReturnType<typeof createWebPlatform>>|undefined;
 void mountClawdle(async()=>{
   if(import.meta.env.DEV&&new URLSearchParams(location.search).get('fixture')==='race') {
     const {createRaceFixture}=await import('./race-fixture');
-    return createRaceFixture();
+    return createRaceFixture({short:new URLSearchParams(location.search).get('short')==='1'});
   }
   recoveryPlatform=await createWebPlatform();
   return createController(recoveryPlatform);

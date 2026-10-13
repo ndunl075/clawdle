@@ -137,7 +137,7 @@ pub fn parse_claude(raw: &[u8], salt: &[u8]) -> Result<Option<AgentEvent>, &'sta
         .into(),
         event_type: "agent.activity".into(),
         source_event: event.into(),
-        observed_at_utc: chrono::Utc::now().to_rfc3339(),
+        observed_at_utc: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
         project_key: v["cwd"].as_str().map(|cwd| {
             let mut h = Sha256::new();
             h.update(salt);

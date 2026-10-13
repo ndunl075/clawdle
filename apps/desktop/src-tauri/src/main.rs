@@ -126,6 +126,23 @@ fn show(app: &tauri::AppHandle, explicit: bool) -> Result<(), String> {
     }
     Ok(())
 }
+/// Hide the main window. A non-activating auto-show uses raw `ShowWindow`, which Tao's cached
+/// visibility never sees, so Tao's `hide()` can be a no-op; fall back to `SW_HIDE` when Win32
+/// still reports the window as visible.
+fn hide_window(window: &tauri::WebviewWindow) -> Result<(), String> {
+    window.hide().map_err(|_| "window_hide")?;
+    #[cfg(windows)]
+    {
+        use windows_sys::Win32::UI::WindowsAndMessaging::{IsWindowVisible, ShowWindow, SW_HIDE};
+        let hwnd = window.hwnd().map_err(|_| "window_handle")?.0;
+        unsafe {
+            if IsWindowVisible(hwnd as _) != 0 {
+                ShowWindow(hwnd as _, SW_HIDE);
+            }
+        }
+    }
+    Ok(())
+}
 #[tauri::command]
 fn native_show(app: tauri::AppHandle, explicit: bool) -> Result<(), String> {
     show(&app, explicit)?;
@@ -146,10 +163,7 @@ fn native_is_visible(app: tauri::AppHandle) -> Result<bool, String> {
 }
 #[tauri::command]
 fn native_hide(app: tauri::AppHandle) -> Result<(), String> {
-    app.get_webview_window("main")
-        .ok_or("window_missing")?
-        .hide()
-        .map_err(|_| "window_hide")?;
+    hide_window(&app.get_webview_window("main").ok_or("window_missing")?)?;
     webview_memory::apply(&app, webview_memory::Transition::Hidden);
     Ok(())
 }
@@ -424,7 +438,10 @@ fn main() {
                     .try_state::<Native>()
                     .is_some_and(|s| lifecycle::background_enabled(&s.dir))
                 {
-                    if window.hide().is_ok() {
+                    if app
+                        .get_webview_window("main")
+                        .is_some_and(|w| hide_window(&w).is_ok())
+                    {
                         webview_memory::apply(app, webview_memory::Transition::Hidden);
                     }
                 } else {

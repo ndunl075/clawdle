@@ -64,7 +64,8 @@ export function validateSavedPuzzle(value:unknown):{valid:true;puzzle:Puzzle}|{v
   const fail=(error:string):{valid:false;error:string}=>({valid:false,error});
   if(!value||typeof value!=='object'||Array.isArray(value))return fail('invalid_puzzle');
   const p=value as Record<string,unknown>;
-  const timestamp=(v:unknown)=>typeof v==='string'&&Number.isFinite(Date.parse(v))&&/T.*Z$/.test(v);
+  // RFC 3339 with an explicit zone. The desktop runtime historically wrote +00:00 rather than Z.
+  const timestamp=(v:unknown)=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.test(v)&&Number.isFinite(Date.parse(v));
   const duration=(v:unknown)=>v===null||(typeof v==='number'&&Number.isFinite(v)&&v>=0);
   if(typeof p.gameId!=='string'||!p.gameId||p.gameId.length>256||!['daily','endless','race','speedrun'].includes(String(p.mode))||p.rulesVersion!=='wordle-5x6-v1'||p.dictionaryVersion!==dictionaryVersion||typeof p.wordId!=='string')return fail('unsupported_puzzle');
   let answer:string;try{answer=wordFromId(p.wordId);}catch{return fail('unknown_word');}
