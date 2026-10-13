@@ -17,7 +17,7 @@
     "observedAtUtc":{"type":"string","format":"date-time"},
     "projectKey":{"type":["string","null"],"pattern":"^[a-f0-9]{64}$"},
     "attentionKind":{"enum":["permission","input"]},
-    "activityKind":{"enum":["session_ready","tool_started","tool_finished"]},
+    "activityKind":{"enum":["session_ready","tool_started","tool_finished","system_turn"]},
     "endReason":{"enum":["closed","interrupted","provider_error","unknown"]}
   }
 }

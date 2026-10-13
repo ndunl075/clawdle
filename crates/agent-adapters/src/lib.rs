@@ -71,7 +71,13 @@ impl AgentEvent {
             .as_ref()
             .is_some_and(|s| !["permission", "input"].contains(&s.as_str()))
             || self.activity_kind.as_ref().is_some_and(|s| {
-                !["session_ready", "tool_started", "tool_finished"].contains(&s.as_str())
+                ![
+                    "session_ready",
+                    "tool_started",
+                    "tool_finished",
+                    "system_turn",
+                ]
+                .contains(&s.as_str())
             })
             || self.end_reason.as_ref().is_some_and(|s| {
                 !["closed", "interrupted", "provider_error", "unknown"].contains(&s.as_str())
@@ -88,6 +94,17 @@ impl AgentEvent {
         }
         Ok(())
     }
+}
+
+/// Claude Code delivers a background agent's result in a new root turn whose prompt it
+/// generates. Real 2.1.282 runs showed that turn's `UserPromptSubmit` is otherwise identical
+/// to a typed one (same fields, fresh `prompt_id`); only the prompt begins with this tag.
+const SYSTEM_TURN_MARKER: &[u8] = b"<task-notification>";
+
+/// Bounded prefix check on the in-memory prompt. Reads at most `SYSTEM_TURN_MARKER.len()`
+/// bytes and returns only a boolean; the prompt itself is never copied, stored or logged.
+fn is_system_turn(prompt: Option<&str>) -> bool {
+    prompt.is_some_and(|p| p.as_bytes().starts_with(SYSTEM_TURN_MARKER))
 }
 
 pub fn parse_claude(raw: &[u8], salt: &[u8]) -> Result<Option<AgentEvent>, &'static str> {
@@ -128,6 +145,10 @@ pub fn parse_claude(raw: &[u8], salt: &[u8]) -> Result<Option<AgentEvent>, &'sta
         end_reason: None,
     };
     match event {
+        // A system-initiated result turn is journaled as activity, so it never starts a race.
+        "UserPromptSubmit" if e.scope == "root" && is_system_turn(v["prompt"].as_str()) => {
+            e.activity_kind = Some("system_turn".into());
+        }
         "UserPromptSubmit" => e.event_type = "agent.started".into(),
         "SessionStart" => e.activity_kind = Some("session_ready".into()),
         "PreToolUse" => e.activity_kind = Some("tool_started".into()),
@@ -209,5 +230,49 @@ mod tests {
         .unwrap();
         v["prompt"] = "secret".into();
         assert!(serde_json::from_value::<AgentEvent>(v).is_err());
+    }
+    #[test]
+    fn system_initiated_turn_is_activity_not_a_start() {
+        let raw = br#"{"hook_event_name":"UserPromptSubmit","session_id":"s","prompt_id":"p2","prompt":"<task-notification>\n<task-id>SECRET_TASK</task-id>\n<result>SECRET_RESULT</result>"}"#;
+        let e = parse_claude(raw, b"").unwrap().unwrap();
+        assert_eq!(e.event_type, "agent.activity");
+        assert_eq!(e.activity_kind.as_deref(), Some("system_turn"));
+        assert_eq!(e.source_event, "UserPromptSubmit");
+        assert_eq!(e.scope, "root");
+        assert_eq!(e.turn_id.as_deref(), Some("p2"));
+        assert!(!serde_json::to_string(&e).unwrap().contains("SECRET"));
+    }
+    #[test]
+    fn typed_prompts_still_start_turns() {
+        let typed = |prompt: &str| {
+            let raw = serde_json::json!({"hook_event_name":"UserPromptSubmit","session_id":"s","prompt_id":"p","prompt":prompt});
+            parse_claude(&serde_json::to_vec(&raw).unwrap(), b"")
+                .unwrap()
+                .unwrap()
+        };
+        for prompt in [
+            "fix the bug",
+            "",
+            " <task-notification>",
+            "mention <task-notification> later",
+        ] {
+            let e = typed(prompt);
+            assert_eq!(e.event_type, "agent.started", "{prompt:?}");
+            assert_eq!(e.activity_kind, None);
+        }
+        let missing = parse_claude(
+            br#"{"hook_event_name":"UserPromptSubmit","session_id":"s","prompt_id":"p"}"#,
+            b"",
+        )
+        .unwrap()
+        .unwrap();
+        assert_eq!(missing.event_type, "agent.started");
+    }
+    #[test]
+    fn marker_only_changes_prompt_start() {
+        let raw = br#"{"hook_event_name":"Stop","session_id":"s","prompt_id":"p","prompt":"<task-notification>"}"#;
+        let e = parse_claude(raw, b"").unwrap().unwrap();
+        assert_eq!(e.event_type, "agent.turn_completed");
+        assert_eq!(e.activity_kind, None);
     }
 }
